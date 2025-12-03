@@ -801,7 +801,7 @@ var SIZE_PRESETS = {
       icon: "\u{1F3B5}",
       description: "\uCD5C\uC18C \uACF5\uAC04 \uCC28\uC9C0",
       width: "100%",
-      height: "54px",
+      height: "100px",
       recommended: true
     },
     {
@@ -810,7 +810,7 @@ var SIZE_PRESETS = {
       icon: "\u{1F3B6}",
       description: "\uC57D\uAC04\uC758 \uC5EC\uBC31 \uD3EC\uD568",
       width: "100%",
-      height: "80px"
+      height: "120px"
     }
   ]
 };

@@ -133,6 +133,12 @@ Before using the plugin, you need to set up Google OAuth credentials:
 
 ## Version History
 
+### v1.0.6 (2025-12-03)
+- **Audio Player Fix**: Increased audio embed height for proper Google Drive player display
+- Changed audio heights: 슬림 (54px → 100px), 표준 (80px → 120px)
+- Google Drive audio player now displays correctly with all controls visible
+- Matches Google Drive's native audio player interface requirements
+
 ### v1.0.5 (2025-12-03)
 - **Major Fix**: Switched to iframe-based embed for video/audio
 - Resolved large file playback issues (files > 25MB)

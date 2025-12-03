@@ -122,7 +122,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             icon: '🎵',
             description: '최소 공간 차지',
             width: '100%',
-            height: '54px',
+            height: '100px',
             recommended: true
         },
         {
@@ -131,7 +131,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             icon: '🎶',
             description: '약간의 여백 포함',
             width: '100%',
-            height: '80px'
+            height: '120px'
         }
     ]
 };
