@@ -1175,36 +1175,35 @@ var EmbedGenerator = class {
     return embedCode;
   }
   /**
-   * Generate video embed (iframe with Google Drive preview)
+   * Generate video embed (HTML5 video with direct content URL)
    */
   generateVideoEmbed(result, size) {
-    const previewUrl = `https://drive.google.com/file/d/${result.fileId}/preview`;
+    const videoUrl = result.webContentLink || `https://drive.google.com/uc?export=download&id=${result.fileId}`;
     return `<div style="width: ${size.width}; margin: 0 auto;">
-<iframe
-    src="${previewUrl}"
+<video
+    src="${videoUrl}"
     width="100%"
     height="${size.height}"
-    allow="autoplay; encrypted-media"
-    allowfullscreen
-    frameborder="0"
-    style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-</iframe>
+    controls
+    preload="metadata"
+    style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #000;">
+    \uBE0C\uB77C\uC6B0\uC800\uAC00 \uBE44\uB514\uC624\uB97C \uC9C0\uC6D0\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.
+</video>
 </div>`;
   }
   /**
-   * Generate audio embed (iframe with Google Drive player)
+   * Generate audio embed (HTML5 audio with direct content URL)
    */
   generateAudioEmbed(result, size) {
-    const previewUrl = `https://drive.google.com/file/d/${result.fileId}/preview`;
+    const audioUrl = result.webContentLink || `https://drive.google.com/uc?export=download&id=${result.fileId}`;
     return `<div style="width: ${size.width}; margin: 0 auto;">
-<iframe
-    src="${previewUrl}"
-    width="100%"
-    height="${size.height}"
-    allow="autoplay"
-    frameborder="0"
-    style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-</iframe>
+<audio
+    src="${audioUrl}"
+    controls
+    preload="metadata"
+    style="width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    \uBE0C\uB77C\uC6B0\uC800\uAC00 \uC624\uB514\uC624\uB97C \uC9C0\uC6D0\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.
+</audio>
 </div>`;
   }
   /**

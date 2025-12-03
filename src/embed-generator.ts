@@ -52,39 +52,40 @@ export class EmbedGenerator {
     }
 
     /**
-     * Generate video embed (iframe with Google Drive preview)
+     * Generate video embed (HTML5 video with direct content URL)
      */
     private generateVideoEmbed(result: DriveUploadResult, size: SizeOption): string {
-        const previewUrl = `https://drive.google.com/file/d/${result.fileId}/preview`;
+        // Use direct content link for immediate playback without processing delay
+        const videoUrl = result.webContentLink || `https://drive.google.com/uc?export=download&id=${result.fileId}`;
 
         return `<div style="width: ${size.width}; margin: 0 auto;">
-<iframe
-    src="${previewUrl}"
+<video
+    src="${videoUrl}"
     width="100%"
     height="${size.height}"
-    allow="autoplay; encrypted-media"
-    allowfullscreen
-    frameborder="0"
-    style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-</iframe>
+    controls
+    preload="metadata"
+    style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #000;">
+    브라우저가 비디오를 지원하지 않습니다.
+</video>
 </div>`;
     }
 
     /**
-     * Generate audio embed (iframe with Google Drive player)
+     * Generate audio embed (HTML5 audio with direct content URL)
      */
     private generateAudioEmbed(result: DriveUploadResult, size: SizeOption): string {
-        const previewUrl = `https://drive.google.com/file/d/${result.fileId}/preview`;
+        // Use direct content link for immediate playback without processing delay
+        const audioUrl = result.webContentLink || `https://drive.google.com/uc?export=download&id=${result.fileId}`;
 
         return `<div style="width: ${size.width}; margin: 0 auto;">
-<iframe
-    src="${previewUrl}"
-    width="100%"
-    height="${size.height}"
-    allow="autoplay"
-    frameborder="0"
-    style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-</iframe>
+<audio
+    src="${audioUrl}"
+    controls
+    preload="metadata"
+    style="width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    브라우저가 오디오를 지원하지 않습니다.
+</audio>
 </div>`;
     }
 

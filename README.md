@@ -133,6 +133,12 @@ Before using the plugin, you need to set up Google OAuth credentials:
 
 ## Version History
 
+### v1.0.3 (2025-12-03)
+- **Fixed**: Video/audio embed now uses HTML5 tags for immediate playback
+- **Fixed**: Eliminated "video still processing" error from Google Drive
+- **Improved**: Direct content URL embedding for faster media loading
+- Videos and audio files now play instantly without Google Drive processing delay
+
 ### v1.0.0 (2025-01-25)
 - Initial release
 - Google Drive upload with OAuth 2.0
