@@ -38,7 +38,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
         },
         {
             id: 'fullwidth',
-            label: 'Full Width',
+            label: 'Full width',
             icon: '🟠',
             description: 'Immersive viewing experience',
             width: '100%',
@@ -73,7 +73,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
         },
         {
             id: 'fullwidth',
-            label: 'Full Screen',
+            label: 'Full screen',
             icon: '🟠',
             description: 'Full-screen document viewer',
             width: '100%',

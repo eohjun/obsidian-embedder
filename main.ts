@@ -42,11 +42,11 @@ export default class DriveEmbedderPlugin extends Plugin {
         // Add settings tab
         this.addSettingTab(new DriveEmbedderSettingTab(this.app, this));
 
-        console.log('Drive Embedder loaded');
+        console.debug('Drive Embedder loaded');
     }
 
     onunload() {
-        console.log('Drive Embedder unloaded');
+        console.debug('Drive Embedder unloaded');
     }
 
     async loadSettings() {
@@ -100,9 +100,10 @@ export default class DriveEmbedderPlugin extends Plugin {
 
             new Notice('✅ Google Drive connected successfully!');
             return true;
-        } catch (error: any) {
+        } catch (error) {
             console.error('OAuth flow failed:', error);
-            new Notice(`❌ Connection failed: ${error.message}`);
+            const message = error instanceof Error ? error.message : String(error);
+            new Notice(`❌ Connection failed: ${message}`);
             return false;
         }
     }
@@ -191,12 +192,16 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         const isConnected = this.plugin.isConnected();
 
-        connectionDiv.createEl('h3', { text: 'Connection status' });
+        new Setting(connectionDiv)
+            .setName('Connection status')
+            .setHeading();
 
         const statusDiv = connectionDiv.createDiv({ cls: 'connection-status' });
-        statusDiv.innerHTML = isConnected
-            ? '<span class="status-connected">✅ Google Drive Connected</span>'
-            : '<span class="status-disconnected">❌ Not Connected</span>';
+        if (isConnected) {
+            statusDiv.createSpan({ cls: 'status-connected', text: '✅ Google Drive connected' });
+        } else {
+            statusDiv.createSpan({ cls: 'status-disconnected', text: '❌ Not connected' });
+        }
 
         if (isConnected) {
             new Setting(connectionDiv)
@@ -228,7 +233,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createOAuthSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Google OAuth' });
+        new Setting(containerEl)
+            .setName('Google OAuth')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Client ID')
@@ -256,7 +263,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createDriveSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Google Drive' });
+        new Setting(containerEl)
+            .setName('Google Drive')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Upload folder')
@@ -272,7 +281,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createEmbedSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Embed defaults' });
+        new Setting(containerEl)
+            .setName('Embed defaults')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Show filename by default')
@@ -299,7 +310,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 })
             );
 
-        containerEl.createEl('h4', { text: 'Default embed size' });
+        new Setting(containerEl)
+            .setName('Default embed size')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Default video size')
@@ -357,54 +370,72 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createHelpSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Help' });
+        new Setting(containerEl)
+            .setName('Help')
+            .setHeading();
 
         const helpDiv = containerEl.createDiv({ cls: 'drive-embedder-help' });
 
-        helpDiv.innerHTML = `
-            <details>
-                <summary><strong>📋 How to set up Google OAuth</strong></summary>
-                <ol>
-                    <li>Go to <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
-                    <li>Create a new project or select an existing one</li>
-                    <li>Go to APIs & Services → OAuth consent screen and configure</li>
-                    <li>Go to APIs & Services → Credentials → Create Credentials → OAuth Client ID</li>
-                    <li>Select Application type: Desktop app</li>
-                    <li>Enter the generated Client ID and Client Secret in the settings above</li>
-                    <li>Enable Google Drive API</li>
-                </ol>
-            </details>
+        // OAuth setup guide
+        const oauthDetails = helpDiv.createEl('details');
+        const oauthSummary = oauthDetails.createEl('summary');
+        oauthSummary.createEl('strong', { text: '📋 How to set up Google OAuth' });
+        const oauthList = oauthDetails.createEl('ol');
+        const oauthStep1 = oauthList.createEl('li');
+        oauthStep1.appendText('Go to ');
+        oauthStep1.createEl('a', { text: 'Google Cloud Console', href: 'https://console.cloud.google.com', attr: { target: '_blank' } });
+        oauthList.createEl('li', { text: 'Create a new project or select an existing one' });
+        oauthList.createEl('li', { text: 'Go to APIs & Services → OAuth consent screen and configure' });
+        oauthList.createEl('li', { text: 'Go to APIs & Services → Credentials → Create Credentials → OAuth Client ID' });
+        oauthList.createEl('li', { text: 'Select Application type: Desktop app' });
+        oauthList.createEl('li', { text: 'Enter the generated Client ID and Client Secret in the settings above' });
+        oauthList.createEl('li', { text: 'Enable Google Drive API' });
 
-            <details>
-                <summary><strong>🎬 Supported file formats</strong></summary>
-                <ul>
-                    <li><strong>Video:</strong> MP4, WebM, MOV, AVI</li>
-                    <li><strong>Audio:</strong> MP3, WAV, OGG, M4A</li>
-                    <li><strong>Document:</strong> PDF</li>
-                    <li><strong>Image:</strong> JPG, PNG, GIF, WebP, SVG</li>
-                </ul>
-            </details>
+        // Supported formats
+        const formatsDetails = helpDiv.createEl('details');
+        const formatsSummary = formatsDetails.createEl('summary');
+        formatsSummary.createEl('strong', { text: '🎬 Supported file formats' });
+        const formatsList = formatsDetails.createEl('ul');
+        const videoLi = formatsList.createEl('li');
+        videoLi.createEl('strong', { text: 'Video: ' });
+        videoLi.appendText('MP4, WebM, MOV, AVI');
+        const audioLi = formatsList.createEl('li');
+        audioLi.createEl('strong', { text: 'Audio: ' });
+        audioLi.appendText('MP3, WAV, OGG, M4A');
+        const docLi = formatsList.createEl('li');
+        docLi.createEl('strong', { text: 'Document: ' });
+        docLi.appendText('PDF');
+        const imageLi = formatsList.createEl('li');
+        imageLi.createEl('strong', { text: 'Image: ' });
+        imageLi.appendText('JPG, PNG, GIF, WebP, SVG');
 
-            <details>
-                <summary><strong>📐 Embed size guide</strong></summary>
-                <ul>
-                    <li><strong>Compact:</strong> Good size for inline content</li>
-                    <li><strong>Medium:</strong> Suitable for general viewing (Recommended)</li>
-                    <li><strong>Large:</strong> When detailed view is needed</li>
-                    <li><strong>Full Width:</strong> Immersive full-width display</li>
-                </ul>
-            </details>
+        // Size guide
+        const sizeDetails = helpDiv.createEl('details');
+        const sizeSummary = sizeDetails.createEl('summary');
+        sizeSummary.createEl('strong', { text: '📐 Embed size guide' });
+        const sizeList = sizeDetails.createEl('ul');
+        const compactLi = sizeList.createEl('li');
+        compactLi.createEl('strong', { text: 'Compact: ' });
+        compactLi.appendText('Good size for inline content');
+        const mediumLi = sizeList.createEl('li');
+        mediumLi.createEl('strong', { text: 'Medium: ' });
+        mediumLi.appendText('Suitable for general viewing (recommended)');
+        const largeLi = sizeList.createEl('li');
+        largeLi.createEl('strong', { text: 'Large: ' });
+        largeLi.appendText('When detailed view is needed');
+        const fullLi = sizeList.createEl('li');
+        fullLi.createEl('strong', { text: 'Full width: ' });
+        fullLi.appendText('Immersive full-width display');
 
-            <details>
-                <summary><strong>🔗 How to use</strong></summary>
-                <ol>
-                    <li>Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette</li>
-                    <li>Select a file (drag & drop or use the file picker button)</li>
-                    <li>Choose your desired embed size</li>
-                    <li>Click the "Upload & Embed" button</li>
-                    <li>The embed code will be automatically inserted after upload</li>
-                </ol>
-            </details>
-        `;
+        // How to use
+        const howtoDetails = helpDiv.createEl('details');
+        const howtoSummary = howtoDetails.createEl('summary');
+        howtoSummary.createEl('strong', { text: '🔗 How to use' });
+        const howtoList = howtoDetails.createEl('ol');
+        howtoList.createEl('li', { text: 'Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
+        howtoList.createEl('li', { text: 'Select a file (drag & drop or use the file picker button)' });
+        howtoList.createEl('li', { text: 'Choose your desired embed size' });
+        howtoList.createEl('li', { text: 'Click the "Upload & Embed" button' });
+        howtoList.createEl('li', { text: 'The embed code will be automatically inserted after upload' });
     }
 }

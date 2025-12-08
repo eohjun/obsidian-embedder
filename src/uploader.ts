@@ -52,7 +52,7 @@ export class GoogleDriveUploader {
     private async ensureValidToken(): Promise<string> {
         if (this.config.tokenExpiresAt && this.config.refreshToken) {
             if (this.oauthFlow.isTokenExpired(this.config.tokenExpiresAt)) {
-                console.log('Access token expired, refreshing...');
+                console.debug('Access token expired, refreshing...');
                 try {
                     const newTokens = await this.oauthFlow.refreshAccessToken(this.config.refreshToken);
 
@@ -64,7 +64,7 @@ export class GoogleDriveUploader {
                     }
 
                     new Notice('Google Drive token automatically refreshed');
-                } catch (error: any) {
+                } catch (error) {
                     console.error('Token refresh failed:', error);
                     throw new Error('Token refresh failed. Please reconnect Google Drive.');
                 }
@@ -176,13 +176,14 @@ export class GoogleDriveUploader {
                 mimeType: file.type
             };
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error uploading to Google Drive:', error);
+            const message = error instanceof Error ? error.message : String(error);
             onProgress?.({
                 stage: 'error',
                 message: 'Upload failed',
                 progress: 0,
-                error: error.message
+                error: message
             });
             return null;
         }
@@ -207,7 +208,7 @@ export class GoogleDriveUploader {
                     type: 'anyone'
                 })
             });
-        } catch (error: any) {
+        } catch (error) {
             console.error('Failed to make file public:', error);
             // Don't throw - file is uploaded, just not public
         }

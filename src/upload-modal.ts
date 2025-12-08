@@ -31,6 +31,11 @@ export class UploadModal extends Modal {
     private progressEl: HTMLElement | null = null;
     private uploadBtn: HTMLButtonElement | null = null;
 
+    // Progress UI Elements
+    private progressFillEl: HTMLElement | null = null;
+    private progressStatusEl: HTMLElement | null = null;
+    private progressPercentEl: HTMLElement | null = null;
+
     constructor(
         app: App,
         uploader: GoogleDriveUploader,
@@ -96,17 +101,13 @@ export class UploadModal extends Modal {
 
         // Drop zone
         const dropZone = section.createDiv({ cls: 'drive-embedder-dropzone' });
-        dropZone.innerHTML = `
-            <div class="dropzone-content">
-                <span class="dropzone-icon">📂</span>
-                <p class="dropzone-text">Drag files here or</p>
-                <button class="dropzone-btn">Select File</button>
-            </div>
-        `;
+        const dropzoneContent = dropZone.createDiv({ cls: 'dropzone-content' });
+        dropzoneContent.createSpan({ cls: 'dropzone-icon', text: '📂' });
+        dropzoneContent.createEl('p', { cls: 'dropzone-text', text: 'Drag files here or' });
+        const selectBtn = dropzoneContent.createEl('button', { cls: 'dropzone-btn', text: 'Select file' });
 
         // Click to select
-        const selectBtn = dropZone.querySelector('.dropzone-btn');
-        selectBtn?.addEventListener('click', () => this.fileInputEl?.click());
+        selectBtn.addEventListener('click', () => this.fileInputEl?.click());
 
         // Drag and drop handlers
         dropZone.addEventListener('dragover', (e) => {
@@ -201,12 +202,12 @@ export class UploadModal extends Modal {
                 cls: `size-option ${preset.id === recommended?.id ? 'recommended' : ''}`
             });
 
-            option.innerHTML = `
-                <span class="size-icon">${preset.icon}</span>
-                <span class="size-label">${preset.label}</span>
-                <span class="size-desc">${preset.description}</span>
-                ${preset.recommended ? '<span class="recommended-badge">Recommended</span>' : ''}
-            `;
+            option.createSpan({ cls: 'size-icon', text: preset.icon });
+            option.createSpan({ cls: 'size-label', text: preset.label });
+            option.createSpan({ cls: 'size-desc', text: preset.description });
+            if (preset.recommended) {
+                option.createSpan({ cls: 'recommended-badge', text: 'Recommended' });
+            }
 
             // Select default (recommended)
             if (preset.id === recommended?.id) {
@@ -252,7 +253,7 @@ export class UploadModal extends Modal {
 
         // Upload button
         this.uploadBtn = buttonContainer.createEl('button', {
-            text: '📤 Upload & Embed',
+            text: '📤 Upload & embed',
             cls: 'drive-embedder-btn primary'
         });
         this.uploadBtn.disabled = true;
@@ -262,33 +263,23 @@ export class UploadModal extends Modal {
     private createSupportedFormatsInfo(container: HTMLElement) {
         const infoSection = container.createDiv({ cls: 'drive-embedder-formats-info' });
 
-        infoSection.innerHTML = `
-            <details>
-                <summary>Supported file formats</summary>
-                <div class="formats-grid">
-                    <div class="format-group">
-                        <span class="format-icon">🎬</span>
-                        <span class="format-label">Video</span>
-                        <span class="format-types">MP4, WebM, MOV, AVI</span>
-                    </div>
-                    <div class="format-group">
-                        <span class="format-icon">🎵</span>
-                        <span class="format-label">Audio</span>
-                        <span class="format-types">MP3, WAV, OGG, M4A</span>
-                    </div>
-                    <div class="format-group">
-                        <span class="format-icon">📄</span>
-                        <span class="format-label">Document</span>
-                        <span class="format-types">PDF</span>
-                    </div>
-                    <div class="format-group">
-                        <span class="format-icon">🖼️</span>
-                        <span class="format-label">Image</span>
-                        <span class="format-types">JPG, PNG, GIF, WebP, SVG</span>
-                    </div>
-                </div>
-            </details>
-        `;
+        const details = infoSection.createEl('details');
+        details.createEl('summary', { text: 'Supported file formats' });
+        const formatsGrid = details.createDiv({ cls: 'formats-grid' });
+
+        const formats = [
+            { icon: '🎬', label: 'Video', types: 'MP4, WebM, MOV, AVI' },
+            { icon: '🎵', label: 'Audio', types: 'MP3, WAV, OGG, M4A' },
+            { icon: '📄', label: 'Document', types: 'PDF' },
+            { icon: '🖼️', label: 'Image', types: 'JPG, PNG, GIF, WebP, SVG' }
+        ];
+
+        formats.forEach(format => {
+            const group = formatsGrid.createDiv({ cls: 'format-group' });
+            group.createSpan({ cls: 'format-icon', text: format.icon });
+            group.createSpan({ cls: 'format-label', text: format.label });
+            group.createSpan({ cls: 'format-types', text: format.types });
+        });
     }
 
     private async handleUpload() {
@@ -330,14 +321,15 @@ export class UploadModal extends Modal {
             });
 
             this.close();
-        } catch (error: any) {
+        } catch (error) {
             console.error('Upload failed:', error);
-            new Notice(`❌ Upload failed: ${error.message}`);
+            const message = error instanceof Error ? error.message : String(error);
+            new Notice(`❌ Upload failed: ${message}`);
 
             // Re-enable upload button
             if (this.uploadBtn) {
                 this.uploadBtn.disabled = false;
-                this.uploadBtn.textContent = '📤 Upload & Embed';
+                this.uploadBtn.textContent = '📤 Upload & embed';
             }
 
             this.hideProgress();
@@ -350,36 +342,29 @@ export class UploadModal extends Modal {
         this.progressEl.empty();
         this.progressEl.removeClass('hidden');
 
-        this.progressEl.innerHTML = `
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="progress-text">
-                    <span class="progress-status">Preparing...</span>
-                    <span class="progress-percent">0%</span>
-                </div>
-            </div>
-        `;
+        const container = this.progressEl.createDiv({ cls: 'progress-container' });
+        const progressBar = container.createDiv({ cls: 'progress-bar' });
+        this.progressFillEl = progressBar.createDiv({ cls: 'progress-fill' });
+        this.progressFillEl.style.width = '0%';
+
+        const progressText = container.createDiv({ cls: 'progress-text' });
+        this.progressStatusEl = progressText.createSpan({ cls: 'progress-status', text: 'Preparing...' });
+        this.progressPercentEl = progressText.createSpan({ cls: 'progress-percent', text: '0%' });
     }
 
     private updateProgress(progress: UploadProgress) {
         if (!this.progressEl) return;
 
-        const fillEl = this.progressEl.querySelector('.progress-fill') as HTMLElement;
-        const statusEl = this.progressEl.querySelector('.progress-status');
-        const percentEl = this.progressEl.querySelector('.progress-percent');
-
-        if (fillEl) {
-            fillEl.style.width = `${progress.progress}%`;
+        if (this.progressFillEl) {
+            this.progressFillEl.style.width = `${progress.progress}%`;
         }
 
-        if (statusEl) {
-            statusEl.textContent = progress.message;
+        if (this.progressStatusEl) {
+            this.progressStatusEl.textContent = progress.message;
         }
 
-        if (percentEl) {
-            percentEl.textContent = `${Math.round(progress.progress)}%`;
+        if (this.progressPercentEl) {
+            this.progressPercentEl.textContent = `${Math.round(progress.progress)}%`;
         }
     }
 

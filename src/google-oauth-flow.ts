@@ -3,6 +3,7 @@
  * Handles token acquisition and refresh for Google Drive API
  */
 import { Notice, requestUrl } from 'obsidian';
+import { shell } from 'electron';
 import * as http from 'http';
 import * as url from 'url';
 import { OAuthTokens } from './types';
@@ -32,14 +33,15 @@ export class GoogleOAuthFlow {
      * Start the OAuth flow - opens browser and waits for callback
      */
     async startOAuthFlow(): Promise<OAuthTokens> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                // Generate PKCE code verifier and challenge for security
-                const codeVerifier = this.generateCodeVerifier();
-                const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+        // Generate PKCE code verifier and challenge for security
+        const codeVerifier = this.generateCodeVerifier();
+        const codeChallenge = await this.generateCodeChallenge(codeVerifier);
 
-                // Start local server to receive callback
-                const redirectUri = `http://localhost:${this.config.redirectPort}/callback`;
+        // Start local server to receive callback
+        const redirectUri = `http://localhost:${this.config.redirectPort}/callback`;
+
+        return new Promise((resolve, reject) => {
+            try {
 
                 this.server = http.createServer(async (req, res) => {
                     try {
@@ -66,11 +68,12 @@ export class GoogleOAuthFlow {
                                     res.end(this.getSuccessHtml());
                                     this.cleanup();
                                     resolve(tokens);
-                                } catch (tokenError: any) {
+                                } catch (tokenError) {
+                                    const errorMessage = tokenError instanceof Error ? tokenError.message : String(tokenError);
                                     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                                    res.end(this.getErrorHtml(tokenError.message));
+                                    res.end(this.getErrorHtml(errorMessage));
                                     this.cleanup();
-                                    reject(tokenError);
+                                    reject(tokenError instanceof Error ? tokenError : new Error(errorMessage));
                                 }
                             }
                         }
@@ -80,11 +83,11 @@ export class GoogleOAuthFlow {
                 });
 
                 this.server.listen(this.config.redirectPort, () => {
-                    console.log(`OAuth callback server listening on port ${this.config.redirectPort}`);
+                    console.debug(`OAuth callback server listening on port ${this.config.redirectPort}`);
                 });
 
                 // Handle server errors
-                this.server.on('error', (err: any) => {
+                this.server.on('error', (err: NodeJS.ErrnoException) => {
                     if (err.code === 'EADDRINUSE') {
                         reject(new Error(`Port ${this.config.redirectPort} is already in use. Please close other applications using this port.`));
                     } else {
@@ -97,7 +100,6 @@ export class GoogleOAuthFlow {
 
                 // Open browser
                 new Notice('Please log in with Google in your browser...', 3000);
-                const { shell } = require('electron');
                 shell.openExternal(authUrl);
 
                 // Set timeout (2 minutes)
@@ -147,9 +149,10 @@ export class GoogleOAuthFlow {
                 expiresIn: data.expires_in,
                 expiresAt: expiresAt
             };
-        } catch (error: any) {
+        } catch (error) {
             console.error('Token refresh error:', error);
-            throw new Error(`Failed to refresh token: ${error.message}`);
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`Failed to refresh token: ${message}`);
         }
     }
 
