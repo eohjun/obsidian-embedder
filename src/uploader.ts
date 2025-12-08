@@ -217,7 +217,7 @@ export class GoogleDriveUploader {
     /**
      * Get file info from Google Drive
      */
-    private async getFileInfo(fileId: string): Promise<any> {
+    private async getFileInfo(fileId: string): Promise<{ webViewLink?: string; webContentLink?: string }> {
         try {
             const accessToken = await this.ensureValidToken();
 
@@ -229,7 +229,7 @@ export class GoogleDriveUploader {
                 }
             });
 
-            return response.json;
+            return response.json as { webViewLink?: string; webContentLink?: string };
         } catch (error) {
             return {};
         }

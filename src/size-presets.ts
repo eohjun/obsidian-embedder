@@ -141,27 +141,27 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
  */
 export const SUPPORTED_FILE_TYPES: SupportedFileType[] = [
     // Video
-    { extension: '.mp4', mimeType: 'video/mp4', category: 'video', icon: '🎬', label: 'MP4 Video' },
-    { extension: '.webm', mimeType: 'video/webm', category: 'video', icon: '🎬', label: 'WebM Video' },
-    { extension: '.mov', mimeType: 'video/quicktime', category: 'video', icon: '🎬', label: 'QuickTime Video' },
-    { extension: '.avi', mimeType: 'video/x-msvideo', category: 'video', icon: '🎬', label: 'AVI Video' },
+    { extension: '.mp4', mimeType: 'video/mp4', category: 'video', icon: '🎬', label: 'MP4 video' },
+    { extension: '.webm', mimeType: 'video/webm', category: 'video', icon: '🎬', label: 'WebM video' },
+    { extension: '.mov', mimeType: 'video/quicktime', category: 'video', icon: '🎬', label: 'QuickTime video' },
+    { extension: '.avi', mimeType: 'video/x-msvideo', category: 'video', icon: '🎬', label: 'AVI video' },
 
     // Audio
-    { extension: '.mp3', mimeType: 'audio/mpeg', category: 'audio', icon: '🎵', label: 'MP3 Audio' },
-    { extension: '.wav', mimeType: 'audio/wav', category: 'audio', icon: '🎵', label: 'WAV Audio' },
-    { extension: '.ogg', mimeType: 'audio/ogg', category: 'audio', icon: '🎵', label: 'OGG Audio' },
-    { extension: '.m4a', mimeType: 'audio/mp4', category: 'audio', icon: '🎵', label: 'M4A Audio' },
+    { extension: '.mp3', mimeType: 'audio/mpeg', category: 'audio', icon: '🎵', label: 'MP3 audio' },
+    { extension: '.wav', mimeType: 'audio/wav', category: 'audio', icon: '🎵', label: 'WAV audio' },
+    { extension: '.ogg', mimeType: 'audio/ogg', category: 'audio', icon: '🎵', label: 'OGG audio' },
+    { extension: '.m4a', mimeType: 'audio/mp4', category: 'audio', icon: '🎵', label: 'M4A audio' },
 
     // Document
-    { extension: '.pdf', mimeType: 'application/pdf', category: 'document', icon: '📄', label: 'PDF Document' },
+    { extension: '.pdf', mimeType: 'application/pdf', category: 'document', icon: '📄', label: 'PDF document' },
 
     // Image
-    { extension: '.jpg', mimeType: 'image/jpeg', category: 'image', icon: '🖼️', label: 'JPEG Image' },
-    { extension: '.jpeg', mimeType: 'image/jpeg', category: 'image', icon: '🖼️', label: 'JPEG Image' },
-    { extension: '.png', mimeType: 'image/png', category: 'image', icon: '🖼️', label: 'PNG Image' },
-    { extension: '.gif', mimeType: 'image/gif', category: 'image', icon: '🖼️', label: 'GIF Image' },
-    { extension: '.webp', mimeType: 'image/webp', category: 'image', icon: '🖼️', label: 'WebP Image' },
-    { extension: '.svg', mimeType: 'image/svg+xml', category: 'image', icon: '🖼️', label: 'SVG Image' }
+    { extension: '.jpg', mimeType: 'image/jpeg', category: 'image', icon: '🖼️', label: 'JPEG image' },
+    { extension: '.jpeg', mimeType: 'image/jpeg', category: 'image', icon: '🖼️', label: 'JPEG image' },
+    { extension: '.png', mimeType: 'image/png', category: 'image', icon: '🖼️', label: 'PNG image' },
+    { extension: '.gif', mimeType: 'image/gif', category: 'image', icon: '🖼️', label: 'GIF image' },
+    { extension: '.webp', mimeType: 'image/webp', category: 'image', icon: '🖼️', label: 'WebP image' },
+    { extension: '.svg', mimeType: 'image/svg+xml', category: 'image', icon: '🖼️', label: 'SVG image' }
 ];
 
 /**

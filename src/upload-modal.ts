@@ -253,7 +253,7 @@ export class UploadModal extends Modal {
 
         // Upload button
         this.uploadBtn = buttonContainer.createEl('button', {
-            text: '📤 Upload & embed',
+            text: '📤 Upload and embed',
             cls: 'drive-embedder-btn primary'
         });
         this.uploadBtn.disabled = true;
@@ -283,7 +283,10 @@ export class UploadModal extends Modal {
     }
 
     private async handleUpload() {
-        if (!this.selectedFile || !this.selectedSize) {
+        const file = this.selectedFile;
+        const size = this.selectedSize;
+
+        if (!file || !size) {
             new Notice('Please select a file and size.');
             return;
         }
@@ -299,7 +302,7 @@ export class UploadModal extends Modal {
 
         try {
             const result = await this.uploader.uploadFile(
-                this.selectedFile,
+                file,
                 this.driveFolder,
                 (progress) => this.updateProgress(progress)
             );
@@ -312,10 +315,10 @@ export class UploadModal extends Modal {
             new Notice('✅ Upload complete! Embed code generated.');
 
             this.onComplete({
-                file: this.selectedFile,
+                file: file,
                 uploadResult: result,
                 embedOptions: {
-                    size: this.selectedSize!,
+                    size: size,
                     showTitle: this.showTitle
                 }
             });
@@ -329,7 +332,7 @@ export class UploadModal extends Modal {
             // Re-enable upload button
             if (this.uploadBtn) {
                 this.uploadBtn.disabled = false;
-                this.uploadBtn.textContent = '📤 Upload & embed';
+                this.uploadBtn.textContent = '📤 Upload and embed';
             }
 
             this.hideProgress();
@@ -345,7 +348,7 @@ export class UploadModal extends Modal {
         const container = this.progressEl.createDiv({ cls: 'progress-container' });
         const progressBar = container.createDiv({ cls: 'progress-bar' });
         this.progressFillEl = progressBar.createDiv({ cls: 'progress-fill' });
-        this.progressFillEl.style.width = '0%';
+        this.progressFillEl.setCssStyles({ width: '0%' });
 
         const progressText = container.createDiv({ cls: 'progress-text' });
         this.progressStatusEl = progressText.createSpan({ cls: 'progress-status', text: 'Preparing...' });
@@ -356,7 +359,7 @@ export class UploadModal extends Modal {
         if (!this.progressEl) return;
 
         if (this.progressFillEl) {
-            this.progressFillEl.style.width = `${progress.progress}%`;
+            this.progressFillEl.setCssStyles({ width: `${progress.progress}%` });
         }
 
         if (this.progressStatusEl) {

@@ -33,7 +33,7 @@ export default class DriveEmbedderPlugin extends Plugin {
         // Add command
         this.addCommand({
             id: 'upload-and-embed',
-            name: 'Upload File & Embed',
+            name: 'Upload file and embed',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 this.openUploadModal(editor);
             }
@@ -243,9 +243,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             .addText(text => text
                 .setPlaceholder('xxx.apps.googleusercontent.com')
                 .setValue(this.plugin.settings.googleClientId)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.googleClientId = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -255,9 +255,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             .addText(text => text
                 .setPlaceholder('GOCSPX-...')
                 .setValue(this.plugin.settings.googleClientSecret)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.googleClientSecret = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
     }
@@ -273,9 +273,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             .addText(text => text
                 .setPlaceholder('Obsidian/DriveEmbedder')
                 .setValue(this.plugin.settings.driveFolder)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.driveFolder = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
     }
@@ -290,9 +290,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             .setDesc('Display filename in embed code by default')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showTitleByDefault)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.showTitleByDefault = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -304,9 +304,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .addOption('light', 'Light')
                 .addOption('dark', 'Dark')
                 .setValue(this.plugin.settings.defaultTheme)
-                .onChange(async (value: 'auto' | 'light' | 'dark') => {
+                .onChange((value: 'auto' | 'light' | 'dark') => {
                     this.plugin.settings.defaultTheme = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -322,9 +322,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .addOption('large', 'Large')
                 .addOption('fullwidth', 'Full width')
                 .setValue(this.plugin.settings.defaultVideoSize)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.defaultVideoSize = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -334,9 +334,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .addOption('slim', 'Slim')
                 .addOption('standard', 'Standard')
                 .setValue(this.plugin.settings.defaultAudioSize)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.defaultAudioSize = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -348,9 +348,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .addOption('large', 'Large')
                 .addOption('fullheight', 'Full height')
                 .setValue(this.plugin.settings.defaultDocumentSize)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.defaultDocumentSize = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
 
@@ -362,9 +362,9 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .addOption('large', 'Large')
                 .addOption('original', 'Original size')
                 .setValue(this.plugin.settings.defaultImageSize)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     this.plugin.settings.defaultImageSize = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 })
             );
     }
@@ -435,7 +435,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         howtoList.createEl('li', { text: 'Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
         howtoList.createEl('li', { text: 'Select a file (drag & drop or use the file picker button)' });
         howtoList.createEl('li', { text: 'Choose your desired embed size' });
-        howtoList.createEl('li', { text: 'Click the "Upload & Embed" button' });
+        howtoList.createEl('li', { text: 'Click the "Upload and embed" button' });
         howtoList.createEl('li', { text: 'The embed code will be automatically inserted after upload' });
     }
 }

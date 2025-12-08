@@ -129,7 +129,7 @@ var GoogleOAuthFlow = class {
         });
         const authUrl = this.buildAuthUrl(redirectUri, codeChallenge);
         new import_obsidian.Notice("Please log in with Google in your browser...", 3e3);
-        import_electron.shell.openExternal(authUrl);
+        void import_electron.shell.openExternal(authUrl);
         setTimeout(() => {
           if (this.server) {
             this.cleanup();
@@ -819,24 +819,24 @@ var SIZE_PRESETS = {
 };
 var SUPPORTED_FILE_TYPES = [
   // Video
-  { extension: ".mp4", mimeType: "video/mp4", category: "video", icon: "\u{1F3AC}", label: "MP4 Video" },
-  { extension: ".webm", mimeType: "video/webm", category: "video", icon: "\u{1F3AC}", label: "WebM Video" },
-  { extension: ".mov", mimeType: "video/quicktime", category: "video", icon: "\u{1F3AC}", label: "QuickTime Video" },
-  { extension: ".avi", mimeType: "video/x-msvideo", category: "video", icon: "\u{1F3AC}", label: "AVI Video" },
+  { extension: ".mp4", mimeType: "video/mp4", category: "video", icon: "\u{1F3AC}", label: "MP4 video" },
+  { extension: ".webm", mimeType: "video/webm", category: "video", icon: "\u{1F3AC}", label: "WebM video" },
+  { extension: ".mov", mimeType: "video/quicktime", category: "video", icon: "\u{1F3AC}", label: "QuickTime video" },
+  { extension: ".avi", mimeType: "video/x-msvideo", category: "video", icon: "\u{1F3AC}", label: "AVI video" },
   // Audio
-  { extension: ".mp3", mimeType: "audio/mpeg", category: "audio", icon: "\u{1F3B5}", label: "MP3 Audio" },
-  { extension: ".wav", mimeType: "audio/wav", category: "audio", icon: "\u{1F3B5}", label: "WAV Audio" },
-  { extension: ".ogg", mimeType: "audio/ogg", category: "audio", icon: "\u{1F3B5}", label: "OGG Audio" },
-  { extension: ".m4a", mimeType: "audio/mp4", category: "audio", icon: "\u{1F3B5}", label: "M4A Audio" },
+  { extension: ".mp3", mimeType: "audio/mpeg", category: "audio", icon: "\u{1F3B5}", label: "MP3 audio" },
+  { extension: ".wav", mimeType: "audio/wav", category: "audio", icon: "\u{1F3B5}", label: "WAV audio" },
+  { extension: ".ogg", mimeType: "audio/ogg", category: "audio", icon: "\u{1F3B5}", label: "OGG audio" },
+  { extension: ".m4a", mimeType: "audio/mp4", category: "audio", icon: "\u{1F3B5}", label: "M4A audio" },
   // Document
-  { extension: ".pdf", mimeType: "application/pdf", category: "document", icon: "\u{1F4C4}", label: "PDF Document" },
+  { extension: ".pdf", mimeType: "application/pdf", category: "document", icon: "\u{1F4C4}", label: "PDF document" },
   // Image
-  { extension: ".jpg", mimeType: "image/jpeg", category: "image", icon: "\u{1F5BC}\uFE0F", label: "JPEG Image" },
-  { extension: ".jpeg", mimeType: "image/jpeg", category: "image", icon: "\u{1F5BC}\uFE0F", label: "JPEG Image" },
-  { extension: ".png", mimeType: "image/png", category: "image", icon: "\u{1F5BC}\uFE0F", label: "PNG Image" },
-  { extension: ".gif", mimeType: "image/gif", category: "image", icon: "\u{1F5BC}\uFE0F", label: "GIF Image" },
-  { extension: ".webp", mimeType: "image/webp", category: "image", icon: "\u{1F5BC}\uFE0F", label: "WebP Image" },
-  { extension: ".svg", mimeType: "image/svg+xml", category: "image", icon: "\u{1F5BC}\uFE0F", label: "SVG Image" }
+  { extension: ".jpg", mimeType: "image/jpeg", category: "image", icon: "\u{1F5BC}\uFE0F", label: "JPEG image" },
+  { extension: ".jpeg", mimeType: "image/jpeg", category: "image", icon: "\u{1F5BC}\uFE0F", label: "JPEG image" },
+  { extension: ".png", mimeType: "image/png", category: "image", icon: "\u{1F5BC}\uFE0F", label: "PNG image" },
+  { extension: ".gif", mimeType: "image/gif", category: "image", icon: "\u{1F5BC}\uFE0F", label: "GIF image" },
+  { extension: ".webp", mimeType: "image/webp", category: "image", icon: "\u{1F5BC}\uFE0F", label: "WebP image" },
+  { extension: ".svg", mimeType: "image/svg+xml", category: "image", icon: "\u{1F5BC}\uFE0F", label: "SVG image" }
 ];
 function getFileTypeInfo(fileName) {
   const ext = fileName.toLowerCase().substring(fileName.lastIndexOf("."));
@@ -1014,7 +1014,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     });
     cancelBtn.addEventListener("click", () => this.close());
     this.uploadBtn = buttonContainer.createEl("button", {
-      text: "\u{1F4E4} Upload & embed",
+      text: "\u{1F4E4} Upload and embed",
       cls: "drive-embedder-btn primary"
     });
     this.uploadBtn.disabled = true;
@@ -1039,7 +1039,9 @@ var UploadModal = class extends import_obsidian3.Modal {
     });
   }
   async handleUpload() {
-    if (!this.selectedFile || !this.selectedSize) {
+    const file = this.selectedFile;
+    const size = this.selectedSize;
+    if (!file || !size) {
       new import_obsidian3.Notice("Please select a file and size.");
       return;
     }
@@ -1050,7 +1052,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     this.showProgress();
     try {
       const result = await this.uploader.uploadFile(
-        this.selectedFile,
+        file,
         this.driveFolder,
         (progress) => this.updateProgress(progress)
       );
@@ -1059,10 +1061,10 @@ var UploadModal = class extends import_obsidian3.Modal {
       }
       new import_obsidian3.Notice("\u2705 Upload complete! Embed code generated.");
       this.onComplete({
-        file: this.selectedFile,
+        file,
         uploadResult: result,
         embedOptions: {
-          size: this.selectedSize,
+          size,
           showTitle: this.showTitle
         }
       });
@@ -1073,7 +1075,7 @@ var UploadModal = class extends import_obsidian3.Modal {
       new import_obsidian3.Notice(`\u274C Upload failed: ${message}`);
       if (this.uploadBtn) {
         this.uploadBtn.disabled = false;
-        this.uploadBtn.textContent = "\u{1F4E4} Upload & embed";
+        this.uploadBtn.textContent = "\u{1F4E4} Upload and embed";
       }
       this.hideProgress();
     }
@@ -1086,7 +1088,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     const container = this.progressEl.createDiv({ cls: "progress-container" });
     const progressBar = container.createDiv({ cls: "progress-bar" });
     this.progressFillEl = progressBar.createDiv({ cls: "progress-fill" });
-    this.progressFillEl.style.width = "0%";
+    this.progressFillEl.setCssStyles({ width: "0%" });
     const progressText = container.createDiv({ cls: "progress-text" });
     this.progressStatusEl = progressText.createSpan({ cls: "progress-status", text: "Preparing..." });
     this.progressPercentEl = progressText.createSpan({ cls: "progress-percent", text: "0%" });
@@ -1095,7 +1097,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     if (!this.progressEl)
       return;
     if (this.progressFillEl) {
-      this.progressFillEl.style.width = `${progress.progress}%`;
+      this.progressFillEl.setCssStyles({ width: `${progress.progress}%` });
     }
     if (this.progressStatusEl) {
       this.progressStatusEl.textContent = progress.message;
@@ -1266,7 +1268,7 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
     });
     this.addCommand({
       id: "upload-and-embed",
-      name: "Upload File & Embed",
+      name: "Upload file and embed",
       editorCallback: (editor, view) => {
         this.openUploadModal(editor);
       }
@@ -1414,64 +1416,64 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
   createOAuthSection(containerEl) {
     new import_obsidian4.Setting(containerEl).setName("Google OAuth").setHeading();
     new import_obsidian4.Setting(containerEl).setName("Client ID").setDesc("OAuth Client ID generated from Google Cloud Console").addText(
-      (text) => text.setPlaceholder("xxx.apps.googleusercontent.com").setValue(this.plugin.settings.googleClientId).onChange(async (value) => {
+      (text) => text.setPlaceholder("xxx.apps.googleusercontent.com").setValue(this.plugin.settings.googleClientId).onChange((value) => {
         this.plugin.settings.googleClientId = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Client secret").setDesc("OAuth client secret generated from Google Cloud Console").addText(
-      (text) => text.setPlaceholder("GOCSPX-...").setValue(this.plugin.settings.googleClientSecret).onChange(async (value) => {
+      (text) => text.setPlaceholder("GOCSPX-...").setValue(this.plugin.settings.googleClientSecret).onChange((value) => {
         this.plugin.settings.googleClientSecret = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
   }
   createDriveSection(containerEl) {
     new import_obsidian4.Setting(containerEl).setName("Google Drive").setHeading();
     new import_obsidian4.Setting(containerEl).setName("Upload folder").setDesc("Google Drive folder path for uploaded files").addText(
-      (text) => text.setPlaceholder("Obsidian/DriveEmbedder").setValue(this.plugin.settings.driveFolder).onChange(async (value) => {
+      (text) => text.setPlaceholder("Obsidian/DriveEmbedder").setValue(this.plugin.settings.driveFolder).onChange((value) => {
         this.plugin.settings.driveFolder = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
   }
   createEmbedSection(containerEl) {
     new import_obsidian4.Setting(containerEl).setName("Embed defaults").setHeading();
     new import_obsidian4.Setting(containerEl).setName("Show filename by default").setDesc("Display filename in embed code by default").addToggle(
-      (toggle) => toggle.setValue(this.plugin.settings.showTitleByDefault).onChange(async (value) => {
+      (toggle) => toggle.setValue(this.plugin.settings.showTitleByDefault).onChange((value) => {
         this.plugin.settings.showTitleByDefault = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default theme").setDesc("Default embed theme (auto-detects system theme)").addDropdown(
-      (dropdown) => dropdown.addOption("auto", "Auto (system theme)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange(async (value) => {
+      (dropdown) => dropdown.addOption("auto", "Auto (system theme)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange((value) => {
         this.plugin.settings.defaultTheme = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default embed size").setHeading();
     new import_obsidian4.Setting(containerEl).setName("Default video size").addDropdown(
-      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullwidth", "Full width").setValue(this.plugin.settings.defaultVideoSize).onChange(async (value) => {
+      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullwidth", "Full width").setValue(this.plugin.settings.defaultVideoSize).onChange((value) => {
         this.plugin.settings.defaultVideoSize = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default audio size").addDropdown(
-      (dropdown) => dropdown.addOption("slim", "Slim").addOption("standard", "Standard").setValue(this.plugin.settings.defaultAudioSize).onChange(async (value) => {
+      (dropdown) => dropdown.addOption("slim", "Slim").addOption("standard", "Standard").setValue(this.plugin.settings.defaultAudioSize).onChange((value) => {
         this.plugin.settings.defaultAudioSize = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default document size").addDropdown(
-      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullheight", "Full height").setValue(this.plugin.settings.defaultDocumentSize).onChange(async (value) => {
+      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullheight", "Full height").setValue(this.plugin.settings.defaultDocumentSize).onChange((value) => {
         this.plugin.settings.defaultDocumentSize = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default image size").addDropdown(
-      (dropdown) => dropdown.addOption("small", "Small").addOption("medium", "Medium").addOption("large", "Large").addOption("original", "Original size").setValue(this.plugin.settings.defaultImageSize).onChange(async (value) => {
+      (dropdown) => dropdown.addOption("small", "Small").addOption("medium", "Medium").addOption("large", "Large").addOption("original", "Original size").setValue(this.plugin.settings.defaultImageSize).onChange((value) => {
         this.plugin.settings.defaultImageSize = value;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       })
     );
   }
@@ -1530,7 +1532,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     howtoList.createEl("li", { text: 'Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
     howtoList.createEl("li", { text: "Select a file (drag & drop or use the file picker button)" });
     howtoList.createEl("li", { text: "Choose your desired embed size" });
-    howtoList.createEl("li", { text: 'Click the "Upload & Embed" button' });
+    howtoList.createEl("li", { text: 'Click the "Upload and embed" button' });
     howtoList.createEl("li", { text: "The embed code will be automatically inserted after upload" });
   }
 };

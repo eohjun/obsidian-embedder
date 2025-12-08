@@ -100,7 +100,7 @@ export class GoogleOAuthFlow {
 
                 // Open browser
                 new Notice('Please log in with Google in your browser...', 3000);
-                shell.openExternal(authUrl);
+                void shell.openExternal(authUrl);
 
                 // Set timeout (2 minutes)
                 setTimeout(() => {
