@@ -1,0 +1,413 @@
+/**
+ * Drive Embedder - Styles
+ */
+
+/* Modal Container */
+.drive-embedder-modal {
+    padding: 20px;
+    max-width: 600px;
+}
+
+.drive-embedder-title {
+    margin: 0 0 8px 0;
+    font-size: 1.5em;
+    color: var(--text-normal);
+}
+
+.drive-embedder-subtitle {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+/* File Input Section */
+.drive-embedder-section {
+    margin-bottom: 20px;
+}
+
+.drive-embedder-file-input {
+    display: none;
+}
+
+.drive-embedder-dropzone {
+    border: 2px dashed var(--background-modifier-border);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background: var(--background-secondary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.drive-embedder-dropzone:hover,
+.drive-embedder-dropzone.dragover {
+    border-color: var(--interactive-accent);
+    background: var(--background-secondary-alt);
+}
+
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropzone-icon {
+    font-size: 48px;
+}
+
+.dropzone-text {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.dropzone-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.dropzone-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* File Info Display */
+.drive-embedder-file-info {
+    margin-bottom: 20px;
+}
+
+.drive-embedder-file-info.hidden {
+    display: none;
+}
+
+.file-info-card {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid var(--background-modifier-border);
+}
+
+.file-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.file-icon {
+    font-size: 24px;
+}
+
+.file-name {
+    font-weight: 600;
+    color: var(--text-normal);
+    word-break: break-all;
+}
+
+.file-details {
+    display: flex;
+    gap: 16px;
+    font-size: 0.85em;
+    color: var(--text-muted);
+}
+
+/* Size Options */
+.drive-embedder-size-options {
+    margin-bottom: 20px;
+}
+
+.drive-embedder-size-options.hidden {
+    display: none;
+}
+
+.size-section-title {
+    margin: 0 0 12px 0;
+    font-size: 1em;
+    color: var(--text-normal);
+}
+
+.size-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.size-option {
+    background: var(--background-secondary);
+    border: 2px solid var(--background-modifier-border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.size-option:hover {
+    border-color: var(--interactive-accent);
+    background: var(--background-secondary-alt);
+}
+
+.size-option.selected {
+    border-color: var(--interactive-accent);
+    background: var(--interactive-accent);
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--interactive-accent) 15%, transparent) 0%,
+        color-mix(in srgb, var(--interactive-accent) 5%, transparent) 100%);
+}
+
+.size-option.recommended::after {
+    content: '★';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 10px;
+    color: var(--interactive-accent);
+}
+
+.size-icon {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+.size-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--text-normal);
+    margin-bottom: 4px;
+}
+
+.size-desc {
+    display: block;
+    font-size: 0.75em;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.recommended-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    font-size: 0.7em;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-radius: 10px;
+}
+
+/* Toggle Section */
+.drive-embedder-toggle-section {
+    margin-bottom: 20px;
+}
+
+.drive-embedder-toggle-section .setting-item {
+    border-top: none;
+    padding-top: 0;
+}
+
+/* Progress Section */
+.drive-embedder-progress {
+    margin-bottom: 20px;
+}
+
+.drive-embedder-progress.hidden {
+    display: none;
+}
+
+.progress-container {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--background-modifier-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--interactive-accent), var(--interactive-success, #4ade80));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+}
+
+.progress-status {
+    color: var(--text-muted);
+}
+
+.progress-percent {
+    color: var(--text-normal);
+    font-weight: 600;
+}
+
+/* Action Buttons */
+.drive-embedder-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.drive-embedder-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.drive-embedder-btn.cancel {
+    background: var(--background-secondary);
+    color: var(--text-muted);
+}
+
+.drive-embedder-btn.cancel:hover {
+    background: var(--background-secondary-alt);
+    color: var(--text-normal);
+}
+
+.drive-embedder-btn.primary {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.drive-embedder-btn.primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.drive-embedder-btn.primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Supported Formats Info */
+.drive-embedder-formats-info {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.drive-embedder-formats-info details {
+    font-size: 0.85em;
+}
+
+.drive-embedder-formats-info summary {
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px 0;
+}
+
+.drive-embedder-formats-info summary:hover {
+    color: var(--text-normal);
+}
+
+.formats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.format-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.format-icon {
+    font-size: 16px;
+}
+
+.format-label {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--text-normal);
+}
+
+.format-types {
+    font-size: 0.8em;
+    color: var(--text-muted);
+}
+
+/* Settings Tab Styles */
+.drive-embedder-connection-section {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.connection-status {
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--background-secondary);
+}
+
+.status-connected {
+    color: var(--interactive-success, #4ade80);
+    font-weight: 600;
+}
+
+.status-disconnected {
+    color: var(--text-error);
+    font-weight: 600;
+}
+
+/* Help Section */
+.drive-embedder-help {
+    font-size: 0.9em;
+}
+
+.drive-embedder-help details {
+    margin-bottom: 12px;
+    padding: 12px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+}
+
+.drive-embedder-help summary {
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.drive-embedder-help ol,
+.drive-embedder-help ul {
+    margin: 8px 0 0 20px;
+    padding: 0;
+}
+
+.drive-embedder-help li {
+    margin-bottom: 6px;
+    color: var(--text-muted);
+}
+
+.drive-embedder-help a {
+    color: var(--interactive-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .size-options-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .formats-grid {
+        grid-template-columns: 1fr;
+    }
+}
