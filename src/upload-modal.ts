@@ -52,7 +52,7 @@ export class UploadModal extends Modal {
 
         // Modal Header
         contentEl.createEl('h2', {
-            text: '📁 Drive Embedder',
+            text: '📁 Upload file',
             cls: 'drive-embedder-title'
         });
 
@@ -189,7 +189,7 @@ export class UploadModal extends Modal {
 
         // Section title
         this.sizeOptionsEl.createEl('h4', {
-            text: '📐 Select Embed Size',
+            text: '📐 Select embed size',
             cls: 'size-section-title'
         });
 
@@ -264,7 +264,7 @@ export class UploadModal extends Modal {
 
         infoSection.innerHTML = `
             <details>
-                <summary>Supported File Formats</summary>
+                <summary>Supported file formats</summary>
                 <div class="formats-grid">
                     <div class="format-group">
                         <span class="format-icon">🎬</span>

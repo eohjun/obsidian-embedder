@@ -112,7 +112,7 @@ var GoogleOAuthFlow = class {
               }
             }
           } catch (err) {
-            reject(err);
+            reject(err instanceof Error ? err : new Error(String(err)));
           }
         });
         this.server.listen(this.config.redirectPort, () => {
@@ -122,7 +122,7 @@ var GoogleOAuthFlow = class {
           if (err.code === "EADDRINUSE") {
             reject(new Error(`Port ${this.config.redirectPort} is already in use. Please close other applications using this port.`));
           } else {
-            reject(err);
+            reject(err instanceof Error ? err : new Error(String(err)));
           }
         });
         const authUrl = this.buildAuthUrl(redirectUri, codeChallenge);
@@ -137,7 +137,7 @@ var GoogleOAuthFlow = class {
         }, 12e4);
       } catch (error) {
         this.cleanup();
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
   }
@@ -872,7 +872,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     contentEl.empty();
     contentEl.addClass("drive-embedder-modal");
     contentEl.createEl("h2", {
-      text: "\u{1F4C1} Drive Embedder",
+      text: "\u{1F4C1} Upload file",
       cls: "drive-embedder-title"
     });
     contentEl.createEl("p", {
@@ -968,7 +968,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     const presets = getSizePresets(category);
     const recommended = getRecommendedSize(category);
     this.sizeOptionsEl.createEl("h4", {
-      text: "\u{1F4D0} Select Embed Size",
+      text: "\u{1F4D0} Select embed size",
       cls: "size-section-title"
     });
     const optionsGrid = this.sizeOptionsEl.createDiv({ cls: "size-options-grid" });
@@ -1021,7 +1021,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     const infoSection = container.createDiv({ cls: "drive-embedder-formats-info" });
     infoSection.innerHTML = `
             <details>
-                <summary>Supported File Formats</summary>
+                <summary>Supported file formats</summary>
                 <div class="formats-grid">
                     <div class="format-group">
                         <span class="format-icon">\u{1F3AC}</span>
@@ -1391,7 +1391,6 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Drive Embedder Settings" });
     this.createConnectionSection(containerEl);
     this.createOAuthSection(containerEl);
     this.createDriveSection(containerEl);
@@ -1401,7 +1400,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
   createConnectionSection(containerEl) {
     const connectionDiv = containerEl.createDiv({ cls: "drive-embedder-connection-section" });
     const isConnected = this.plugin.isConnected();
-    connectionDiv.createEl("h3", { text: "Connection Status" });
+    connectionDiv.createEl("h3", { text: "Connection status" });
     const statusDiv = connectionDiv.createDiv({ cls: "connection-status" });
     statusDiv.innerHTML = isConnected ? '<span class="status-connected">\u2705 Google Drive Connected</span>' : '<span class="status-disconnected">\u274C Not Connected</span>';
     if (isConnected) {
@@ -1423,14 +1422,14 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     }
   }
   createOAuthSection(containerEl) {
-    containerEl.createEl("h3", { text: "Google OAuth Settings" });
+    containerEl.createEl("h3", { text: "Google OAuth" });
     new import_obsidian4.Setting(containerEl).setName("Client ID").setDesc("OAuth Client ID generated from Google Cloud Console").addText(
       (text) => text.setPlaceholder("xxx.apps.googleusercontent.com").setValue(this.plugin.settings.googleClientId).onChange(async (value) => {
         this.plugin.settings.googleClientId = value;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Client Secret").setDesc("OAuth Client Secret generated from Google Cloud Console").addText(
+    new import_obsidian4.Setting(containerEl).setName("Client secret").setDesc("OAuth client secret generated from Google Cloud Console").addText(
       (text) => text.setPlaceholder("GOCSPX-...").setValue(this.plugin.settings.googleClientSecret).onChange(async (value) => {
         this.plugin.settings.googleClientSecret = value;
         await this.plugin.saveSettings();
@@ -1438,8 +1437,8 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     );
   }
   createDriveSection(containerEl) {
-    containerEl.createEl("h3", { text: "Google Drive Settings" });
-    new import_obsidian4.Setting(containerEl).setName("Upload Folder").setDesc("Google Drive folder path for uploaded files").addText(
+    containerEl.createEl("h3", { text: "Google Drive" });
+    new import_obsidian4.Setting(containerEl).setName("Upload folder").setDesc("Google Drive folder path for uploaded files").addText(
       (text) => text.setPlaceholder("Obsidian/DriveEmbedder").setValue(this.plugin.settings.driveFolder).onChange(async (value) => {
         this.plugin.settings.driveFolder = value;
         await this.plugin.saveSettings();
@@ -1447,40 +1446,40 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     );
   }
   createEmbedSection(containerEl) {
-    containerEl.createEl("h3", { text: "Embed Settings" });
-    new import_obsidian4.Setting(containerEl).setName("Show Filename by Default").setDesc("Display filename in embed code by default").addToggle(
+    containerEl.createEl("h3", { text: "Embed defaults" });
+    new import_obsidian4.Setting(containerEl).setName("Show filename by default").setDesc("Display filename in embed code by default").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.showTitleByDefault).onChange(async (value) => {
         this.plugin.settings.showTitleByDefault = value;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Default Theme").setDesc("Default embed theme (auto-detects system theme)").addDropdown(
-      (dropdown) => dropdown.addOption("auto", "Auto (System Theme)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange(async (value) => {
+    new import_obsidian4.Setting(containerEl).setName("Default theme").setDesc("Default embed theme (auto-detects system theme)").addDropdown(
+      (dropdown) => dropdown.addOption("auto", "Auto (system theme)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange(async (value) => {
         this.plugin.settings.defaultTheme = value;
         await this.plugin.saveSettings();
       })
     );
-    containerEl.createEl("h4", { text: "Default Embed Size" });
-    new import_obsidian4.Setting(containerEl).setName("Default Video Size").addDropdown(
-      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullwidth", "Full Width").setValue(this.plugin.settings.defaultVideoSize).onChange(async (value) => {
+    containerEl.createEl("h4", { text: "Default embed size" });
+    new import_obsidian4.Setting(containerEl).setName("Default video size").addDropdown(
+      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullwidth", "Full width").setValue(this.plugin.settings.defaultVideoSize).onChange(async (value) => {
         this.plugin.settings.defaultVideoSize = value;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Default Audio Size").addDropdown(
+    new import_obsidian4.Setting(containerEl).setName("Default audio size").addDropdown(
       (dropdown) => dropdown.addOption("slim", "Slim").addOption("standard", "Standard").setValue(this.plugin.settings.defaultAudioSize).onChange(async (value) => {
         this.plugin.settings.defaultAudioSize = value;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Default Document Size").addDropdown(
-      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullheight", "Full Height").setValue(this.plugin.settings.defaultDocumentSize).onChange(async (value) => {
+    new import_obsidian4.Setting(containerEl).setName("Default document size").addDropdown(
+      (dropdown) => dropdown.addOption("compact", "Compact").addOption("medium", "Medium").addOption("large", "Large").addOption("fullheight", "Full height").setValue(this.plugin.settings.defaultDocumentSize).onChange(async (value) => {
         this.plugin.settings.defaultDocumentSize = value;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Default Image Size").addDropdown(
-      (dropdown) => dropdown.addOption("small", "Small").addOption("medium", "Medium").addOption("large", "Large").addOption("original", "Original Size").setValue(this.plugin.settings.defaultImageSize).onChange(async (value) => {
+    new import_obsidian4.Setting(containerEl).setName("Default image size").addDropdown(
+      (dropdown) => dropdown.addOption("small", "Small").addOption("medium", "Medium").addOption("large", "Large").addOption("original", "Original size").setValue(this.plugin.settings.defaultImageSize).onChange(async (value) => {
         this.plugin.settings.defaultImageSize = value;
         await this.plugin.saveSettings();
       })
@@ -1491,7 +1490,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     const helpDiv = containerEl.createDiv({ cls: "drive-embedder-help" });
     helpDiv.innerHTML = `
             <details>
-                <summary><strong>\u{1F4CB} How to Set Up Google OAuth</strong></summary>
+                <summary><strong>\u{1F4CB} How to set up Google OAuth</strong></summary>
                 <ol>
                     <li>Go to <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
                     <li>Create a new project or select an existing one</li>
@@ -1504,7 +1503,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>\u{1F3AC} Supported File Formats</strong></summary>
+                <summary><strong>\u{1F3AC} Supported file formats</strong></summary>
                 <ul>
                     <li><strong>Video:</strong> MP4, WebM, MOV, AVI</li>
                     <li><strong>Audio:</strong> MP3, WAV, OGG, M4A</li>
@@ -1514,7 +1513,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>\u{1F4D0} Embed Size Guide</strong></summary>
+                <summary><strong>\u{1F4D0} Embed size guide</strong></summary>
                 <ul>
                     <li><strong>Compact:</strong> Good size for inline content</li>
                     <li><strong>Medium:</strong> Suitable for general viewing (Recommended)</li>
@@ -1524,7 +1523,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>\u{1F517} How to Use</strong></summary>
+                <summary><strong>\u{1F517} How to use</strong></summary>
                 <ol>
                     <li>Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette</li>
                     <li>Select a file (drag & drop or use the file picker button)</li>

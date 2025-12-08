@@ -75,7 +75,7 @@ export class GoogleOAuthFlow {
                             }
                         }
                     } catch (err) {
-                        reject(err);
+                        reject(err instanceof Error ? err : new Error(String(err)));
                     }
                 });
 
@@ -88,7 +88,7 @@ export class GoogleOAuthFlow {
                     if (err.code === 'EADDRINUSE') {
                         reject(new Error(`Port ${this.config.redirectPort} is already in use. Please close other applications using this port.`));
                     } else {
-                        reject(err);
+                        reject(err instanceof Error ? err : new Error(String(err)));
                     }
                 });
 
@@ -110,7 +110,7 @@ export class GoogleOAuthFlow {
 
             } catch (error) {
                 this.cleanup();
-                reject(error);
+                reject(error instanceof Error ? error : new Error(String(error)));
             }
         });
     }

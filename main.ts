@@ -168,7 +168,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Drive Embedder Settings' });
+        // Main heading removed per Obsidian guidelines (no plugin name in settings)
 
         // Connection status
         this.createConnectionSection(containerEl);
@@ -191,7 +191,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         const isConnected = this.plugin.isConnected();
 
-        connectionDiv.createEl('h3', { text: 'Connection Status' });
+        connectionDiv.createEl('h3', { text: 'Connection status' });
 
         const statusDiv = connectionDiv.createDiv({ cls: 'connection-status' });
         statusDiv.innerHTML = isConnected
@@ -228,7 +228,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createOAuthSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Google OAuth Settings' });
+        containerEl.createEl('h3', { text: 'Google OAuth' });
 
         new Setting(containerEl)
             .setName('Client ID')
@@ -243,8 +243,8 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Client Secret')
-            .setDesc('OAuth Client Secret generated from Google Cloud Console')
+            .setName('Client secret')
+            .setDesc('OAuth client secret generated from Google Cloud Console')
             .addText(text => text
                 .setPlaceholder('GOCSPX-...')
                 .setValue(this.plugin.settings.googleClientSecret)
@@ -256,10 +256,10 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createDriveSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Google Drive Settings' });
+        containerEl.createEl('h3', { text: 'Google Drive' });
 
         new Setting(containerEl)
-            .setName('Upload Folder')
+            .setName('Upload folder')
             .setDesc('Google Drive folder path for uploaded files')
             .addText(text => text
                 .setPlaceholder('Obsidian/DriveEmbedder')
@@ -272,10 +272,10 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
     }
 
     private createEmbedSection(containerEl: HTMLElement) {
-        containerEl.createEl('h3', { text: 'Embed Settings' });
+        containerEl.createEl('h3', { text: 'Embed defaults' });
 
         new Setting(containerEl)
-            .setName('Show Filename by Default')
+            .setName('Show filename by default')
             .setDesc('Display filename in embed code by default')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showTitleByDefault)
@@ -286,10 +286,10 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Default Theme')
+            .setName('Default theme')
             .setDesc('Default embed theme (auto-detects system theme)')
             .addDropdown(dropdown => dropdown
-                .addOption('auto', 'Auto (System Theme)')
+                .addOption('auto', 'Auto (system theme)')
                 .addOption('light', 'Light')
                 .addOption('dark', 'Dark')
                 .setValue(this.plugin.settings.defaultTheme)
@@ -299,15 +299,15 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 })
             );
 
-        containerEl.createEl('h4', { text: 'Default Embed Size' });
+        containerEl.createEl('h4', { text: 'Default embed size' });
 
         new Setting(containerEl)
-            .setName('Default Video Size')
+            .setName('Default video size')
             .addDropdown(dropdown => dropdown
                 .addOption('compact', 'Compact')
                 .addOption('medium', 'Medium')
                 .addOption('large', 'Large')
-                .addOption('fullwidth', 'Full Width')
+                .addOption('fullwidth', 'Full width')
                 .setValue(this.plugin.settings.defaultVideoSize)
                 .onChange(async (value) => {
                     this.plugin.settings.defaultVideoSize = value;
@@ -316,7 +316,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Default Audio Size')
+            .setName('Default audio size')
             .addDropdown(dropdown => dropdown
                 .addOption('slim', 'Slim')
                 .addOption('standard', 'Standard')
@@ -328,12 +328,12 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Default Document Size')
+            .setName('Default document size')
             .addDropdown(dropdown => dropdown
                 .addOption('compact', 'Compact')
                 .addOption('medium', 'Medium')
                 .addOption('large', 'Large')
-                .addOption('fullheight', 'Full Height')
+                .addOption('fullheight', 'Full height')
                 .setValue(this.plugin.settings.defaultDocumentSize)
                 .onChange(async (value) => {
                     this.plugin.settings.defaultDocumentSize = value;
@@ -342,12 +342,12 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Default Image Size')
+            .setName('Default image size')
             .addDropdown(dropdown => dropdown
                 .addOption('small', 'Small')
                 .addOption('medium', 'Medium')
                 .addOption('large', 'Large')
-                .addOption('original', 'Original Size')
+                .addOption('original', 'Original size')
                 .setValue(this.plugin.settings.defaultImageSize)
                 .onChange(async (value) => {
                     this.plugin.settings.defaultImageSize = value;
@@ -363,7 +363,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         helpDiv.innerHTML = `
             <details>
-                <summary><strong>📋 How to Set Up Google OAuth</strong></summary>
+                <summary><strong>📋 How to set up Google OAuth</strong></summary>
                 <ol>
                     <li>Go to <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
                     <li>Create a new project or select an existing one</li>
@@ -376,7 +376,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>🎬 Supported File Formats</strong></summary>
+                <summary><strong>🎬 Supported file formats</strong></summary>
                 <ul>
                     <li><strong>Video:</strong> MP4, WebM, MOV, AVI</li>
                     <li><strong>Audio:</strong> MP3, WAV, OGG, M4A</li>
@@ -386,7 +386,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>📐 Embed Size Guide</strong></summary>
+                <summary><strong>📐 Embed size guide</strong></summary>
                 <ul>
                     <li><strong>Compact:</strong> Good size for inline content</li>
                     <li><strong>Medium:</strong> Suitable for general viewing (Recommended)</li>
@@ -396,7 +396,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
             </details>
 
             <details>
-                <summary><strong>🔗 How to Use</strong></summary>
+                <summary><strong>🔗 How to use</strong></summary>
                 <ol>
                     <li>Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette</li>
                     <li>Select a file (drag & drop or use the file picker button)</li>
