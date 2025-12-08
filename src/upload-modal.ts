@@ -257,7 +257,7 @@ export class UploadModal extends Modal {
             cls: 'drive-embedder-btn primary'
         });
         this.uploadBtn.disabled = true;
-        this.uploadBtn.addEventListener('click', () => this.handleUpload());
+        this.uploadBtn.addEventListener('click', () => { void this.handleUpload(); });
     }
 
     private createSupportedFormatsInfo(container: HTMLElement) {

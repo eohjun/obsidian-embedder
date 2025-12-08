@@ -1018,7 +1018,9 @@ var UploadModal = class extends import_obsidian3.Modal {
       cls: "drive-embedder-btn primary"
     });
     this.uploadBtn.disabled = true;
-    this.uploadBtn.addEventListener("click", () => this.handleUpload());
+    this.uploadBtn.addEventListener("click", () => {
+      void this.handleUpload();
+    });
   }
   createSupportedFormatsInfo(container) {
     const infoSection = container.createDiv({ cls: "drive-embedder-formats-info" });
@@ -1263,7 +1265,7 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
     await this.loadSettings();
     this.embedGenerator = new EmbedGenerator();
     this.initializeServices();
-    this.addRibbonIcon("cloud-upload", "Drive Embedder: Upload File", () => {
+    this.addRibbonIcon("cloud-upload", "Drive Embedder: Upload file", () => {
       this.openUploadModal();
     });
     this.addCommand({
@@ -1355,18 +1357,20 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
       this.uploader,
       this.settings.driveFolder,
       this.settings.showTitleByDefault,
-      async (result) => {
-        const embedCode = this.embedGenerator.generateEmbed(
-          result.file.name,
-          result.uploadResult,
-          result.embedOptions
-        );
-        if (editor) {
-          editor.replaceSelection(embedCode);
-        } else {
-          await navigator.clipboard.writeText(embedCode);
-          new import_obsidian4.Notice("\u{1F4CB} Embed code copied to clipboard!");
-        }
+      (result) => {
+        void (async () => {
+          const embedCode = this.embedGenerator.generateEmbed(
+            result.file.name,
+            result.uploadResult,
+            result.embedOptions
+          );
+          if (editor) {
+            editor.replaceSelection(embedCode);
+          } else {
+            await navigator.clipboard.writeText(embedCode);
+            new import_obsidian4.Notice("\u{1F4CB} Embed code copied to clipboard!");
+          }
+        })();
       }
     ).open();
   }
@@ -1491,7 +1495,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     oauthList.createEl("li", { text: "Go to APIs & Services \u2192 OAuth consent screen and configure" });
     oauthList.createEl("li", { text: "Go to APIs & Services \u2192 Credentials \u2192 Create Credentials \u2192 OAuth Client ID" });
     oauthList.createEl("li", { text: "Select Application type: Desktop app" });
-    oauthList.createEl("li", { text: "Enter the generated Client ID and Client Secret in the settings above" });
+    oauthList.createEl("li", { text: "Enter the generated client ID and client secret in the settings above" });
     oauthList.createEl("li", { text: "Enable Google Drive API" });
     const formatsDetails = helpDiv.createEl("details");
     const formatsSummary = formatsDetails.createEl("summary");

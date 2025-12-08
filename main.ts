@@ -26,7 +26,7 @@ export default class DriveEmbedderPlugin extends Plugin {
         this.initializeServices();
 
         // Add ribbon icon
-        this.addRibbonIcon('cloud-upload', 'Drive Embedder: Upload File', () => {
+        this.addRibbonIcon('cloud-upload', 'Drive Embedder: Upload file', () => {
             this.openUploadModal();
         });
 
@@ -137,21 +137,23 @@ export default class DriveEmbedderPlugin extends Plugin {
             this.uploader,
             this.settings.driveFolder,
             this.settings.showTitleByDefault,
-            async (result: UploadModalResult) => {
-                const embedCode = this.embedGenerator.generateEmbed(
-                    result.file.name,
-                    result.uploadResult,
-                    result.embedOptions
-                );
+            (result: UploadModalResult) => {
+                void (async () => {
+                    const embedCode = this.embedGenerator.generateEmbed(
+                        result.file.name,
+                        result.uploadResult,
+                        result.embedOptions
+                    );
 
-                if (editor) {
-                    // Insert at cursor position
-                    editor.replaceSelection(embedCode);
-                } else {
-                    // Copy to clipboard
-                    await navigator.clipboard.writeText(embedCode);
-                    new Notice('📋 Embed code copied to clipboard!');
-                }
+                    if (editor) {
+                        // Insert at cursor position
+                        editor.replaceSelection(embedCode);
+                    } else {
+                        // Copy to clipboard
+                        await navigator.clipboard.writeText(embedCode);
+                        new Notice('📋 Embed code copied to clipboard!');
+                    }
+                })();
             }
         ).open();
     }
@@ -388,7 +390,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         oauthList.createEl('li', { text: 'Go to APIs & Services → OAuth consent screen and configure' });
         oauthList.createEl('li', { text: 'Go to APIs & Services → Credentials → Create Credentials → OAuth Client ID' });
         oauthList.createEl('li', { text: 'Select Application type: Desktop app' });
-        oauthList.createEl('li', { text: 'Enter the generated Client ID and Client Secret in the settings above' });
+        oauthList.createEl('li', { text: 'Enter the generated client ID and client secret in the settings above' });
         oauthList.createEl('li', { text: 'Enable Google Drive API' });
 
         // Supported formats
