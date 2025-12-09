@@ -26,14 +26,14 @@ export default class DriveEmbedderPlugin extends Plugin {
         this.initializeServices();
 
         // Add ribbon icon
-        this.addRibbonIcon('cloud-upload', 'Drive Embedder: Upload file', () => {
+        this.addRibbonIcon('cloud-upload', 'Drive Embedder: upload file', () => {
             this.openUploadModal();
         });
 
         // Add command
         this.addCommand({
             id: 'upload-and-embed',
-            name: 'Upload file and embed',
+            name: 'upload file and embed',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 this.openUploadModal(editor);
             }
@@ -86,7 +86,7 @@ export default class DriveEmbedderPlugin extends Plugin {
 
     async startOAuthFlow(): Promise<boolean> {
         if (!this.oauthFlow) {
-            new Notice('Please enter Google OAuth settings first.');
+            new Notice('please enter Google OAuth settings first.');
             return false;
         }
 
@@ -98,7 +98,7 @@ export default class DriveEmbedderPlugin extends Plugin {
             this.settings.tokenExpiresAt = tokens.expiresAt;
             await this.saveSettings();
 
-            new Notice('✅ Google Drive connected successfully!');
+            new Notice('✅ connected to Google Drive successfully!');
             return true;
         } catch (error) {
             console.error('OAuth flow failed:', error);
@@ -114,7 +114,7 @@ export default class DriveEmbedderPlugin extends Plugin {
         this.settings.tokenExpiresAt = 0;
         this.uploader = null;
         await this.saveSettings();
-        new Notice('Google Drive disconnected.');
+        new Notice('disconnected from Google Drive.');
     }
 
     isConnected(): boolean {
@@ -123,12 +123,12 @@ export default class DriveEmbedderPlugin extends Plugin {
 
     private openUploadModal(editor?: Editor) {
         if (!this.isConnected()) {
-            new Notice('Please connect to Google Drive first. (Connect in settings)');
+            new Notice('please connect to Google Drive first (in settings).');
             return;
         }
 
         if (!this.uploader) {
-            new Notice('Uploader initialization failed. Please check settings.');
+            new Notice('uploader initialization failed. please check settings.');
             return;
         }
 
@@ -200,7 +200,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         const statusDiv = connectionDiv.createDiv({ cls: 'connection-status' });
         if (isConnected) {
-            statusDiv.createSpan({ cls: 'status-connected', text: '✅ Google Drive connected' });
+            statusDiv.createSpan({ cls: 'status-connected', text: '✅ connected to Google Drive' });
         } else {
             statusDiv.createSpan({ cls: 'status-disconnected', text: '❌ not connected' });
         }
@@ -208,7 +208,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         if (isConnected) {
             new Setting(connectionDiv)
                 .setName('Disconnect')
-                .setDesc('Disconnect from Google Drive')
+                .setDesc('disconnect from Google Drive')
                 .addButton(button => button
                     .setButtonText('Disconnect')
                     .setWarning()
@@ -221,7 +221,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         } else {
             new Setting(connectionDiv)
                 .setName('Connect to Google Drive')
-                .setDesc('Enter OAuth settings below, then click Connect')
+                .setDesc('enter OAuth settings below, then click Connect')
                 .addButton(button => button
                     .setButtonText('Connect')
                     .setCta()
@@ -291,7 +291,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Show filename by default')
-            .setDesc('Display filename in embed code by default')
+            .setDesc('display filename in embed code by default')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showTitleByDefault)
                 .onChange((value) => {
@@ -302,7 +302,7 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Default theme')
-            .setDesc('Default embed theme (auto-detects system theme)')
+            .setDesc('default embed theme (auto-detects system theme)')
             .addDropdown(dropdown => dropdown
                 .addOption('auto', 'Auto (follows system)')
                 .addOption('light', 'Light')
@@ -386,14 +386,14 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         oauthSummary.createEl('strong', { text: '📋 how to set up Google OAuth' });
         const oauthList = oauthDetails.createEl('ol');
         const oauthStep1 = oauthList.createEl('li');
-        oauthStep1.appendText('Go to ');
+        oauthStep1.appendText('go to ');
         oauthStep1.createEl('a', { text: 'Google Cloud Console', href: 'https://console.cloud.google.com', attr: { target: '_blank' } });
-        oauthList.createEl('li', { text: 'Create a new project or select an existing one' });
-        oauthList.createEl('li', { text: 'Go to APIs & services → OAuth consent screen and configure' });
-        oauthList.createEl('li', { text: 'Go to APIs & services → Credentials → Create credentials → OAuth client ID' });
-        oauthList.createEl('li', { text: 'Select application type: desktop app' });
-        oauthList.createEl('li', { text: 'Enter the generated client ID and client secret in the settings above' });
-        oauthList.createEl('li', { text: 'Enable Google Drive API' });
+        oauthList.createEl('li', { text: 'create a new project or select an existing one' });
+        oauthList.createEl('li', { text: 'go to APIs & services → OAuth consent screen and configure' });
+        oauthList.createEl('li', { text: 'go to APIs & services → Credentials → Create credentials → OAuth client ID' });
+        oauthList.createEl('li', { text: 'select application type: desktop app' });
+        oauthList.createEl('li', { text: 'enter the generated client ID and client secret in the settings above' });
+        oauthList.createEl('li', { text: 'enable Google Drive API' });
 
         // Supported formats
         const formatsDetails = helpDiv.createEl('details');
@@ -420,26 +420,26 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
         const sizeList = sizeDetails.createEl('ul');
         const compactLi = sizeList.createEl('li');
         compactLi.createEl('strong', { text: 'Compact: ' });
-        compactLi.appendText('Good size for inline content');
+        compactLi.appendText('good size for inline content');
         const mediumLi = sizeList.createEl('li');
         mediumLi.createEl('strong', { text: 'Medium: ' });
-        mediumLi.appendText('Suitable for general viewing (recommended)');
+        mediumLi.appendText('suitable for general viewing (recommended)');
         const largeLi = sizeList.createEl('li');
         largeLi.createEl('strong', { text: 'Large: ' });
-        largeLi.appendText('When detailed view is needed');
+        largeLi.appendText('when detailed view is needed');
         const fullLi = sizeList.createEl('li');
         fullLi.createEl('strong', { text: 'Full width: ' });
-        fullLi.appendText('Immersive full-width display');
+        fullLi.appendText('immersive full-width display');
 
         // How to use
         const howtoDetails = helpDiv.createEl('details');
         const howtoSummary = howtoDetails.createEl('summary');
         howtoSummary.createEl('strong', { text: '🔗 how to use' });
         const howtoList = howtoDetails.createEl('ol');
-        howtoList.createEl('li', { text: 'Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
-        howtoList.createEl('li', { text: 'Select a file (drag & drop or use the file picker button)' });
-        howtoList.createEl('li', { text: 'Choose your desired embed size' });
-        howtoList.createEl('li', { text: 'Click the "Upload and embed" button' });
-        howtoList.createEl('li', { text: 'The embed code will be automatically inserted after upload' });
+        howtoList.createEl('li', { text: 'click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
+        howtoList.createEl('li', { text: 'select a file (drag & drop or use the file picker button)' });
+        howtoList.createEl('li', { text: 'choose your desired embed size' });
+        howtoList.createEl('li', { text: 'click the "Upload and embed" button' });
+        howtoList.createEl('li', { text: 'the embed code will be automatically inserted after upload' });
     }
 }

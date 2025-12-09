@@ -99,7 +99,7 @@ export class GoogleOAuthFlow {
                 const authUrl = this.buildAuthUrl(redirectUri, codeChallenge);
 
                 // Open browser
-                new Notice('Please log in with Google in your browser...', 3000);
+                new Notice('please log in with Google in your browser...', 3000);
                 void shell.openExternal(authUrl);
 
                 // Set timeout (2 minutes)

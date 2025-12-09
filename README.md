@@ -67,7 +67,7 @@ Before using the plugin, you need to set up Google OAuth credentials:
 ### Upload and Embed Files
 
 1. Click the cloud upload icon in the ribbon, or
-2. Use command palette: "Drive Embedder: Upload File & Embed"
+2. Use command palette: "Drive Embedder: upload file and embed"
 3. Select a file or drag & drop
 4. Choose your preferred size (intuitive size labels)
 5. Click "Upload & Embed"

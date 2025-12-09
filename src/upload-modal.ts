@@ -62,7 +62,7 @@ export class UploadModal extends Modal {
         });
 
         contentEl.createEl('p', {
-            text: 'Upload files to Google Drive and generate embed code.',
+            text: 'upload files to Google Drive and generate embed code.',
             cls: 'drive-embedder-subtitle'
         });
 
@@ -103,8 +103,8 @@ export class UploadModal extends Modal {
         const dropZone = section.createDiv({ cls: 'drive-embedder-dropzone' });
         const dropzoneContent = dropZone.createDiv({ cls: 'dropzone-content' });
         dropzoneContent.createSpan({ cls: 'dropzone-icon', text: '📂' });
-        dropzoneContent.createEl('p', { cls: 'dropzone-text', text: 'Drag files here or' });
-        const selectBtn = dropzoneContent.createEl('button', { cls: 'dropzone-btn', text: 'Select file' });
+        dropzoneContent.createEl('p', { cls: 'dropzone-text', text: 'drag files here or' });
+        const selectBtn = dropzoneContent.createEl('button', { cls: 'dropzone-btn', text: 'select file' });
 
         // Click to select
         selectBtn.addEventListener('click', () => this.fileInputEl?.click());
@@ -141,7 +141,7 @@ export class UploadModal extends Modal {
         // Check if file type is supported
         const fileInfo = getFileTypeInfo(file.name);
         if (!fileInfo) {
-            new Notice('Unsupported file type.');
+            new Notice('unsupported file type.');
             return;
         }
 
@@ -206,7 +206,7 @@ export class UploadModal extends Modal {
             option.createSpan({ cls: 'size-label', text: preset.label });
             option.createSpan({ cls: 'size-desc', text: preset.description });
             if (preset.recommended) {
-                option.createSpan({ cls: 'recommended-badge', text: 'Recommended' });
+                option.createSpan({ cls: 'recommended-badge', text: 'recommended' });
             }
 
             // Select default (recommended)
@@ -232,7 +232,7 @@ export class UploadModal extends Modal {
 
         new Setting(toggleSection)
             .setName('Show filename')
-            .setDesc('Display filename above the embed')
+            .setDesc('display filename above the embed')
             .addToggle(toggle => toggle
                 .setValue(this.showTitle)
                 .onChange(value => {
@@ -264,7 +264,7 @@ export class UploadModal extends Modal {
         const infoSection = container.createDiv({ cls: 'drive-embedder-formats-info' });
 
         const details = infoSection.createEl('details');
-        details.createEl('summary', { text: 'Supported file formats' });
+        details.createEl('summary', { text: 'supported file formats' });
         const formatsGrid = details.createDiv({ cls: 'formats-grid' });
 
         const formats = [
@@ -287,7 +287,7 @@ export class UploadModal extends Modal {
         const size = this.selectedSize;
 
         if (!file || !size) {
-            new Notice('Please select a file and size.');
+            new Notice('please select a file and size.');
             return;
         }
 
@@ -312,7 +312,7 @@ export class UploadModal extends Modal {
             }
 
             // Success!
-            new Notice('✅ upload complete! Embed code generated.');
+            new Notice('✅ upload complete! embed code generated.');
 
             this.onComplete({
                 file: file,
@@ -351,7 +351,7 @@ export class UploadModal extends Modal {
         this.progressFillEl.setCssStyles({ width: '0%' });
 
         const progressText = container.createDiv({ cls: 'progress-text' });
-        this.progressStatusEl = progressText.createSpan({ cls: 'progress-status', text: 'Preparing...' });
+        this.progressStatusEl = progressText.createSpan({ cls: 'progress-status', text: 'preparing...' });
         this.progressPercentEl = progressText.createSpan({ cls: 'progress-percent', text: '0%' });
     }
 

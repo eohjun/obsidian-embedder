@@ -15,7 +15,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'compact',
             label: 'Compact',
             icon: '🔹',
-            description: 'Good for inline content',
+            description: 'good for inline content',
             width: '60%',
             height: '280px'
         },
@@ -23,7 +23,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'medium',
             label: 'Medium',
             icon: '🔸',
-            description: 'Recommended for most use cases',
+            description: 'recommended for most use cases',
             width: '80%',
             height: '400px',
             recommended: true
@@ -32,7 +32,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'large',
             label: 'Large',
             icon: '🔶',
-            description: 'For detailed viewing',
+            description: 'for detailed viewing',
             width: '100%',
             height: '500px'
         },
@@ -40,7 +40,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'fullwidth',
             label: 'Full width',
             icon: '🟠',
-            description: 'Immersive viewing experience',
+            description: 'immersive viewing experience',
             width: '100%',
             height: '600px'
         }
@@ -50,7 +50,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'compact',
             label: 'Compact',
             icon: '🔹',
-            description: 'Quick preview',
+            description: 'quick preview',
             width: '70%',
             height: '400px'
         },
@@ -58,7 +58,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'medium',
             label: 'Medium',
             icon: '🔸',
-            description: 'Good for reading documents',
+            description: 'good for reading documents',
             width: '100%',
             height: '500px',
             recommended: true
@@ -67,7 +67,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'large',
             label: 'Large',
             icon: '🔶',
-            description: 'Comfortable reading',
+            description: 'comfortable reading',
             width: '100%',
             height: '650px'
         },
@@ -75,7 +75,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'fullwidth',
             label: 'Full screen',
             icon: '🟠',
-            description: 'Full-screen document viewer',
+            description: 'full-screen document viewer',
             width: '100%',
             height: '800px'
         }
@@ -85,7 +85,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'thumbnail',
             label: 'Thumbnail',
             icon: '🔹',
-            description: 'Small preview image',
+            description: 'small preview image',
             width: '200px',
             height: 'auto'
         },
@@ -93,7 +93,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'compact',
             label: 'Compact',
             icon: '🔸',
-            description: 'Suitable for body content',
+            description: 'suitable for body content',
             width: '400px',
             height: 'auto'
         },
@@ -101,7 +101,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'medium',
             label: 'Medium',
             icon: '🔶',
-            description: 'Good for viewing images',
+            description: 'good for viewing images',
             width: '600px',
             height: 'auto',
             recommended: true
@@ -110,7 +110,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'large',
             label: 'Large',
             icon: '🟠',
-            description: 'For detailed viewing',
+            description: 'for detailed viewing',
             width: '100%',
             height: 'auto'
         }
@@ -120,7 +120,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'slim',
             label: 'Slim',
             icon: '🎵',
-            description: 'Minimal space',
+            description: 'minimal space',
             width: '100%',
             height: '100px',
             recommended: true
@@ -129,7 +129,7 @@ export const SIZE_PRESETS: Record<ContentCategory, SizeOption[]> = {
             id: 'standard',
             label: 'Standard',
             icon: '🎶',
-            description: 'With some padding',
+            description: 'with some padding',
             width: '100%',
             height: '120px'
         }
