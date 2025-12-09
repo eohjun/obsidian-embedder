@@ -57,7 +57,7 @@ export class UploadModal extends Modal {
 
         // Modal Header
         contentEl.createEl('h2', {
-            text: '📁 Upload file',
+            text: '📁 upload file',
             cls: 'drive-embedder-title'
         });
 
@@ -190,7 +190,7 @@ export class UploadModal extends Modal {
 
         // Section title
         this.sizeOptionsEl.createEl('h4', {
-            text: '📐 Select embed size',
+            text: '📐 select embed size',
             cls: 'size-section-title'
         });
 
@@ -253,7 +253,7 @@ export class UploadModal extends Modal {
 
         // Upload button
         this.uploadBtn = buttonContainer.createEl('button', {
-            text: '📤 Upload and embed',
+            text: '📤 upload and embed',
             cls: 'drive-embedder-btn primary'
         });
         this.uploadBtn.disabled = true;
@@ -312,7 +312,7 @@ export class UploadModal extends Modal {
             }
 
             // Success!
-            new Notice('✅ Upload complete! Embed code generated.');
+            new Notice('✅ upload complete! Embed code generated.');
 
             this.onComplete({
                 file: file,
@@ -327,12 +327,12 @@ export class UploadModal extends Modal {
         } catch (error) {
             console.error('Upload failed:', error);
             const message = error instanceof Error ? error.message : String(error);
-            new Notice(`❌ Upload failed: ${message}`);
+            new Notice(`❌ upload failed: ${message}`);
 
             // Re-enable upload button
             if (this.uploadBtn) {
                 this.uploadBtn.disabled = false;
-                this.uploadBtn.textContent = '📤 Upload and embed';
+                this.uploadBtn.textContent = '📤 upload and embed';
             }
 
             this.hideProgress();

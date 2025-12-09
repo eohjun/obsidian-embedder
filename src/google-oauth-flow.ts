@@ -273,7 +273,7 @@ export class GoogleOAuthFlow {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Google Drive Connection Complete</title>
+    <title>Google Drive connection complete</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -312,7 +312,7 @@ export class GoogleOAuthFlow {
 <body>
     <div class="container">
         <div class="success-icon">✅</div>
-        <h1>Connection Complete!</h1>
+        <h1>Connection complete!</h1>
         <p>Google Drive has been connected to Drive Embedder.</p>
         <p class="close-hint">You can close this window and return to Obsidian.</p>
     </div>
@@ -330,7 +330,7 @@ export class GoogleOAuthFlow {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Connection Failed</title>
+    <title>Connection failed</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -373,7 +373,7 @@ export class GoogleOAuthFlow {
 <body>
     <div class="container">
         <div class="error-icon">❌</div>
-        <h1>Connection Failed</h1>
+        <h1>Connection failed</h1>
         <p>Failed to connect to Google Drive.</p>
         <div class="error-detail">${error}</div>
         <p>Please try again in Obsidian.</p>

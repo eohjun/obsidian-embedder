@@ -131,7 +131,7 @@ export class EmbedGenerator {
      * Generate generic embed (link only)
      */
     private generateGenericEmbed(result: DriveUploadResult): string {
-        return `[📎 Open File](${result.webViewLink})`;
+        return `[📎 Open file](${result.webViewLink})`;
     }
 
     /**

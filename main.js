@@ -277,7 +277,7 @@ var GoogleOAuthFlow = class {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Google Drive Connection Complete</title>
+    <title>Google Drive connection complete</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -316,7 +316,7 @@ var GoogleOAuthFlow = class {
 <body>
     <div class="container">
         <div class="success-icon">\u2705</div>
-        <h1>Connection Complete!</h1>
+        <h1>Connection complete!</h1>
         <p>Google Drive has been connected to Drive Embedder.</p>
         <p class="close-hint">You can close this window and return to Obsidian.</p>
     </div>
@@ -333,7 +333,7 @@ var GoogleOAuthFlow = class {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Connection Failed</title>
+    <title>Connection failed</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -376,7 +376,7 @@ var GoogleOAuthFlow = class {
 <body>
     <div class="container">
         <div class="error-icon">\u274C</div>
-        <h1>Connection Failed</h1>
+        <h1>Connection failed</h1>
         <p>Failed to connect to Google Drive.</p>
         <div class="error-detail">${error}</div>
         <p>Please try again in Obsidian.</p>
@@ -879,7 +879,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     contentEl.empty();
     contentEl.addClass("drive-embedder-modal");
     contentEl.createEl("h2", {
-      text: "\u{1F4C1} Upload file",
+      text: "\u{1F4C1} upload file",
       cls: "drive-embedder-title"
     });
     contentEl.createEl("p", {
@@ -971,7 +971,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     const presets = getSizePresets(category);
     const recommended = getRecommendedSize(category);
     this.sizeOptionsEl.createEl("h4", {
-      text: "\u{1F4D0} Select embed size",
+      text: "\u{1F4D0} select embed size",
       cls: "size-section-title"
     });
     const optionsGrid = this.sizeOptionsEl.createDiv({ cls: "size-options-grid" });
@@ -1014,7 +1014,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     });
     cancelBtn.addEventListener("click", () => this.close());
     this.uploadBtn = buttonContainer.createEl("button", {
-      text: "\u{1F4E4} Upload and embed",
+      text: "\u{1F4E4} upload and embed",
       cls: "drive-embedder-btn primary"
     });
     this.uploadBtn.disabled = true;
@@ -1061,7 +1061,7 @@ var UploadModal = class extends import_obsidian3.Modal {
       if (!result) {
         throw new Error("Failed to receive upload result.");
       }
-      new import_obsidian3.Notice("\u2705 Upload complete! Embed code generated.");
+      new import_obsidian3.Notice("\u2705 upload complete! Embed code generated.");
       this.onComplete({
         file,
         uploadResult: result,
@@ -1074,10 +1074,10 @@ var UploadModal = class extends import_obsidian3.Modal {
     } catch (error) {
       console.error("Upload failed:", error);
       const message = error instanceof Error ? error.message : String(error);
-      new import_obsidian3.Notice(`\u274C Upload failed: ${message}`);
+      new import_obsidian3.Notice(`\u274C upload failed: ${message}`);
       if (this.uploadBtn) {
         this.uploadBtn.disabled = false;
-        this.uploadBtn.textContent = "\u{1F4E4} Upload and embed";
+        this.uploadBtn.textContent = "\u{1F4E4} upload and embed";
       }
       this.hideProgress();
     }
@@ -1234,7 +1234,7 @@ var EmbedGenerator = class {
    * Generate generic embed (link only)
    */
   generateGenericEmbed(result) {
-    return `[\u{1F4CE} Open File](${result.webViewLink})`;
+    return `[\u{1F4CE} Open file](${result.webViewLink})`;
   }
   /**
    * Generate markdown link format
@@ -1328,7 +1328,7 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
     } catch (error) {
       console.error("OAuth flow failed:", error);
       const message = error instanceof Error ? error.message : String(error);
-      new import_obsidian4.Notice(`\u274C Connection failed: ${message}`);
+      new import_obsidian4.Notice(`\u274C connection failed: ${message}`);
       return false;
     }
   }
@@ -1368,7 +1368,7 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
             editor.replaceSelection(embedCode);
           } else {
             await navigator.clipboard.writeText(embedCode);
-            new import_obsidian4.Notice("\u{1F4CB} Embed code copied to clipboard!");
+            new import_obsidian4.Notice("\u{1F4CB} embed code copied to clipboard!");
           }
         })();
       }
@@ -1397,35 +1397,37 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     if (isConnected) {
       statusDiv.createSpan({ cls: "status-connected", text: "\u2705 Google Drive connected" });
     } else {
-      statusDiv.createSpan({ cls: "status-disconnected", text: "\u274C Not connected" });
+      statusDiv.createSpan({ cls: "status-disconnected", text: "\u274C not connected" });
     }
     if (isConnected) {
       new import_obsidian4.Setting(connectionDiv).setName("Disconnect").setDesc("Disconnect from Google Drive").addButton(
-        (button) => button.setButtonText("Disconnect").setWarning().onClick(async () => {
-          await this.plugin.disconnectGoogleDrive();
-          this.display();
+        (button) => button.setButtonText("Disconnect").setWarning().onClick(() => {
+          void this.plugin.disconnectGoogleDrive().then(() => {
+            this.display();
+          });
         })
       );
     } else {
-      new import_obsidian4.Setting(connectionDiv).setName("Connect to Google Drive").setDesc("Enter OAuth settings below, then click the Connect button").addButton(
-        (button) => button.setButtonText("Connect").setCta().onClick(async () => {
-          const success = await this.plugin.startOAuthFlow();
-          if (success) {
-            this.display();
-          }
+      new import_obsidian4.Setting(connectionDiv).setName("Connect to Google Drive").setDesc("Enter OAuth settings below, then click Connect").addButton(
+        (button) => button.setButtonText("Connect").setCta().onClick(() => {
+          void this.plugin.startOAuthFlow().then((success) => {
+            if (success) {
+              this.display();
+            }
+          });
         })
       );
     }
   }
   createOAuthSection(containerEl) {
     new import_obsidian4.Setting(containerEl).setName("Google OAuth").setHeading();
-    new import_obsidian4.Setting(containerEl).setName("Client ID").setDesc("OAuth Client ID generated from Google Cloud Console").addText(
+    new import_obsidian4.Setting(containerEl).setName("Client ID").setDesc("OAuth client ID from Google Cloud Console").addText(
       (text) => text.setPlaceholder("xxx.apps.googleusercontent.com").setValue(this.plugin.settings.googleClientId).onChange((value) => {
         this.plugin.settings.googleClientId = value;
         void this.plugin.saveSettings();
       })
     );
-    new import_obsidian4.Setting(containerEl).setName("Client secret").setDesc("OAuth client secret generated from Google Cloud Console").addText(
+    new import_obsidian4.Setting(containerEl).setName("Client secret").setDesc("OAuth client secret from Google Cloud Console").addText(
       (text) => text.setPlaceholder("GOCSPX-...").setValue(this.plugin.settings.googleClientSecret).onChange((value) => {
         this.plugin.settings.googleClientSecret = value;
         void this.plugin.saveSettings();
@@ -1450,7 +1452,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Default theme").setDesc("Default embed theme (auto-detects system theme)").addDropdown(
-      (dropdown) => dropdown.addOption("auto", "Auto (system theme)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange((value) => {
+      (dropdown) => dropdown.addOption("auto", "Auto (follows system)").addOption("light", "Light").addOption("dark", "Dark").setValue(this.plugin.settings.defaultTheme).onChange((value) => {
         this.plugin.settings.defaultTheme = value;
         void this.plugin.saveSettings();
       })
@@ -1486,20 +1488,20 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     const helpDiv = containerEl.createDiv({ cls: "drive-embedder-help" });
     const oauthDetails = helpDiv.createEl("details");
     const oauthSummary = oauthDetails.createEl("summary");
-    oauthSummary.createEl("strong", { text: "\u{1F4CB} How to set up Google OAuth" });
+    oauthSummary.createEl("strong", { text: "\u{1F4CB} how to set up Google OAuth" });
     const oauthList = oauthDetails.createEl("ol");
     const oauthStep1 = oauthList.createEl("li");
     oauthStep1.appendText("Go to ");
     oauthStep1.createEl("a", { text: "Google Cloud Console", href: "https://console.cloud.google.com", attr: { target: "_blank" } });
     oauthList.createEl("li", { text: "Create a new project or select an existing one" });
-    oauthList.createEl("li", { text: "Go to APIs & Services \u2192 OAuth consent screen and configure" });
-    oauthList.createEl("li", { text: "Go to APIs & Services \u2192 Credentials \u2192 Create Credentials \u2192 OAuth Client ID" });
-    oauthList.createEl("li", { text: "Select Application type: Desktop app" });
+    oauthList.createEl("li", { text: "Go to APIs & services \u2192 OAuth consent screen and configure" });
+    oauthList.createEl("li", { text: "Go to APIs & services \u2192 Credentials \u2192 Create credentials \u2192 OAuth client ID" });
+    oauthList.createEl("li", { text: "Select application type: desktop app" });
     oauthList.createEl("li", { text: "Enter the generated client ID and client secret in the settings above" });
     oauthList.createEl("li", { text: "Enable Google Drive API" });
     const formatsDetails = helpDiv.createEl("details");
     const formatsSummary = formatsDetails.createEl("summary");
-    formatsSummary.createEl("strong", { text: "\u{1F3AC} Supported file formats" });
+    formatsSummary.createEl("strong", { text: "\u{1F3AC} supported file formats" });
     const formatsList = formatsDetails.createEl("ul");
     const videoLi = formatsList.createEl("li");
     videoLi.createEl("strong", { text: "Video: " });
@@ -1515,7 +1517,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     imageLi.appendText("JPG, PNG, GIF, WebP, SVG");
     const sizeDetails = helpDiv.createEl("details");
     const sizeSummary = sizeDetails.createEl("summary");
-    sizeSummary.createEl("strong", { text: "\u{1F4D0} Embed size guide" });
+    sizeSummary.createEl("strong", { text: "\u{1F4D0} embed size guide" });
     const sizeList = sizeDetails.createEl("ul");
     const compactLi = sizeList.createEl("li");
     compactLi.createEl("strong", { text: "Compact: " });
@@ -1531,7 +1533,7 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
     fullLi.appendText("Immersive full-width display");
     const howtoDetails = helpDiv.createEl("details");
     const howtoSummary = howtoDetails.createEl("summary");
-    howtoSummary.createEl("strong", { text: "\u{1F517} How to use" });
+    howtoSummary.createEl("strong", { text: "\u{1F517} how to use" });
     const howtoList = howtoDetails.createEl("ol");
     howtoList.createEl("li", { text: 'Click the cloud icon in the sidebar or search "Drive Embedder" in the command palette' });
     howtoList.createEl("li", { text: "Select a file (drag & drop or use the file picker button)" });
