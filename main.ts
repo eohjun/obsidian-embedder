@@ -59,11 +59,12 @@ export default class DriveEmbedderPlugin extends Plugin {
     }
 
     private initializeServices() {
+        const redirectPort = this.settings.oauthRedirectPort || 8586;
         if (this.settings.googleClientId && this.settings.googleClientSecret) {
             this.oauthFlow = new GoogleOAuthFlow({
                 clientId: this.settings.googleClientId,
                 clientSecret: this.settings.googleClientSecret,
-                redirectPort: 8586
+                redirectPort
             });
 
             if (this.settings.googleAccessToken) {
@@ -153,7 +154,10 @@ export default class DriveEmbedderPlugin extends Plugin {
                         await navigator.clipboard.writeText(embedCode);
                         new Notice('📋 embed code copied to clipboard!');
                     }
-                })();
+                })().catch((error) => {
+                    console.error('Drive Embedder: embed generation failed:', error);
+                    new Notice(`Failed to generate embed: ${error instanceof Error ? error.message : String(error)}`);
+                });
             }
         ).open();
     }
@@ -262,6 +266,21 @@ class DriveEmbedderSettingTab extends PluginSettingTab {
                 .onChange((value) => {
                     this.plugin.settings.googleClientSecret = value;
                     void this.plugin.saveSettings();
+                })
+            );
+
+        new Setting(containerEl)
+            .setName('OAuth redirect port')
+            .setDesc('Local port for OAuth callback (change if 8586 is in use)')
+            .addText(text => text
+                .setPlaceholder('8586')
+                .setValue(String(this.plugin.settings.oauthRedirectPort || 8586))
+                .onChange((value) => {
+                    const port = parseInt(value, 10);
+                    if (!isNaN(port) && port > 0 && port < 65536) {
+                        this.plugin.settings.oauthRedirectPort = port;
+                        void this.plugin.saveSettings();
+                    }
                 })
             );
     }

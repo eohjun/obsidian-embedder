@@ -19,9 +19,11 @@ export class GoogleDriveUploader {
     private readonly API_URL = 'https://www.googleapis.com/drive/v3';
     private readonly UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3';
     private readonly REDIRECT_PORT = 8586;
+    private readonly REQUEST_TIMEOUT_MS = 15000;
 
     private config: GoogleDriveConfig;
     private oauthFlow: GoogleOAuthFlow;
+    private folderIdCache = new Map<string, string>();
 
     constructor(config: GoogleDriveConfig) {
         this.config = config;
@@ -30,6 +32,22 @@ export class GoogleDriveUploader {
             clientSecret: config.clientSecret,
             redirectPort: this.REDIRECT_PORT
         });
+    }
+
+    /**
+     * Wrap a promise with a timeout
+     */
+    private async withTimeout<T>(promise: Promise<T>, ms?: number): Promise<T> {
+        const timeout = ms ?? this.REQUEST_TIMEOUT_MS;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timer = setTimeout(() => reject(new Error(`Request timed out after ${timeout}ms`)), timeout);
+        });
+        try {
+            return await Promise.race([promise, timeoutPromise]);
+        } finally {
+            if (timer !== undefined) clearTimeout(timer);
+        }
     }
 
     /**
@@ -132,7 +150,7 @@ export class GoogleDriveUploader {
                 base64Content +
                 closeDelimiter;
 
-            const uploadResponse = await requestUrl({
+            const uploadResponse = await this.withTimeout(requestUrl({
                 url: `${this.UPLOAD_URL}/files?uploadType=multipart&fields=id,webViewLink,webContentLink,name,mimeType`,
                 method: 'POST',
                 headers: {
@@ -140,13 +158,16 @@ export class GoogleDriveUploader {
                     'Content-Type': `multipart/related; boundary=${boundary}`
                 },
                 body: multipartBody
-            });
+            }), 60000); // 60s for uploads
 
             if (uploadResponse.status !== 200) {
                 throw new Error(`Upload failed: ${uploadResponse.status}`);
             }
 
             const fileData = uploadResponse.json;
+            if (!fileData || typeof fileData.id !== 'string') {
+                throw new Error('Upload response missing file ID');
+            }
             const fileId = fileData.id;
 
             // Stage 3: Setting permission
@@ -196,7 +217,7 @@ export class GoogleDriveUploader {
         try {
             const accessToken = await this.ensureValidToken();
 
-            await requestUrl({
+            await this.withTimeout(requestUrl({
                 url: `${this.API_URL}/files/${fileId}/permissions`,
                 method: 'POST',
                 headers: {
@@ -207,7 +228,7 @@ export class GoogleDriveUploader {
                     role: 'reader',
                     type: 'anyone'
                 })
-            });
+            }));
         } catch (error) {
             console.error('Failed to make file public:', error);
             // Don't throw - file is uploaded, just not public
@@ -221,13 +242,13 @@ export class GoogleDriveUploader {
         try {
             const accessToken = await this.ensureValidToken();
 
-            const response = await requestUrl({
+            const response = await this.withTimeout(requestUrl({
                 url: `${this.API_URL}/files/${fileId}?fields=webViewLink,webContentLink`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
-            });
+            }));
 
             return response.json as { webViewLink?: string; webContentLink?: string };
         } catch (error) {
@@ -236,13 +257,23 @@ export class GoogleDriveUploader {
     }
 
     /**
-     * Ensure folder exists, creating if necessary
+     * Ensure folder exists, creating if necessary (with in-memory caching)
      */
     private async ensureFolder(folderPath: string): Promise<string> {
         const parts = folderPath.split('/').filter(p => p.length > 0);
         let parentId = 'root';
+        let cumulativePath = '';
 
         for (const folderName of parts) {
+            cumulativePath += '/' + folderName;
+
+            // Check cache first
+            const cached = this.folderIdCache.get(cumulativePath);
+            if (cached) {
+                parentId = cached;
+                continue;
+            }
+
             const existingId = await this.findFolder(folderName, parentId);
 
             if (existingId) {
@@ -250,9 +281,18 @@ export class GoogleDriveUploader {
             } else {
                 parentId = await this.createFolder(folderName, parentId);
             }
+
+            this.folderIdCache.set(cumulativePath, parentId);
         }
 
         return parentId;
+    }
+
+    /**
+     * Escape single quotes in Google Drive API query strings
+     */
+    private escapeQueryValue(value: string): string {
+        return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     }
 
     /**
@@ -261,19 +301,20 @@ export class GoogleDriveUploader {
     private async findFolder(name: string, parentId: string): Promise<string | null> {
         try {
             const accessToken = await this.ensureValidToken();
-            const query = `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+            const escapedName = this.escapeQueryValue(name);
+            const query = `name='${escapedName}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
 
-            const response = await requestUrl({
+            const response = await this.withTimeout(requestUrl({
                 url: `${this.API_URL}/files?q=${encodeURIComponent(query)}&fields=files(id)`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
-            });
+            }));
 
             if (response.status === 200) {
                 const data = response.json;
-                if (data.files && data.files.length > 0) {
+                if (data.files && Array.isArray(data.files) && data.files.length > 0 && data.files[0].id) {
                     return data.files[0].id;
                 }
             }
@@ -295,7 +336,7 @@ export class GoogleDriveUploader {
             parents: [parentId]
         };
 
-        const response = await requestUrl({
+        const response = await this.withTimeout(requestUrl({
             url: `${this.API_URL}/files`,
             method: 'POST',
             headers: {
@@ -303,7 +344,7 @@ export class GoogleDriveUploader {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(metadata)
-        });
+        }));
 
         if (response.status !== 200) {
             throw new Error(`Folder creation failed: ${response.status}`);
@@ -319,13 +360,13 @@ export class GoogleDriveUploader {
         try {
             const accessToken = await this.ensureValidToken();
 
-            const response = await requestUrl({
+            const response = await this.withTimeout(requestUrl({
                 url: `${this.API_URL}/about?fields=user`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
-            });
+            }));
 
             return response.status === 200;
         } catch (error) {
@@ -340,13 +381,13 @@ export class GoogleDriveUploader {
         try {
             const accessToken = await this.ensureValidToken();
 
-            const response = await requestUrl({
+            const response = await this.withTimeout(requestUrl({
                 url: `${this.API_URL}/about?fields=user`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
-            });
+            }));
 
             if (response.status === 200) {
                 const data = response.json;
@@ -371,14 +412,16 @@ export class GoogleDriveUploader {
     }
 
     /**
-     * Convert ArrayBuffer to base64
+     * Convert ArrayBuffer to base64 (chunked to avoid O(n²) string concatenation)
      */
     private arrayBufferToBase64(buffer: ArrayBuffer): string {
         const bytes = new Uint8Array(buffer);
-        let binary = '';
-        for (let i = 0; i < bytes.length; i++) {
-            binary += String.fromCharCode(bytes[i]);
+        const CHUNK_SIZE = 8192;
+        const chunks: string[] = [];
+        for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+            const slice = bytes.subarray(i, Math.min(i + CHUNK_SIZE, bytes.length));
+            chunks.push(String.fromCharCode.apply(null, slice as unknown as number[]));
         }
-        return btoa(binary);
+        return btoa(chunks.join(''));
     }
 }

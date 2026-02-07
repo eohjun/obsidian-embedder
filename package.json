@@ -1,6 +1,6 @@
 {
     "name": "drive-embedder",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "description": "Upload local files to Google Drive and embed them in Obsidian notes",
     "main": "main.js",
     "scripts": {

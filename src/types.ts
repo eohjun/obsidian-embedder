@@ -65,6 +65,9 @@ export interface DriveEmbedderSettings {
     googleRefreshToken: string;
     tokenExpiresAt: number;
 
+    // OAuth redirect port (default: 8586)
+    oauthRedirectPort: number;
+
     // Drive settings
     driveFolder: string;
 

@@ -101,6 +101,9 @@ export class UploadModal extends Modal {
 
         // Drop zone
         const dropZone = section.createDiv({ cls: 'drive-embedder-dropzone' });
+        dropZone.setAttribute('role', 'button');
+        dropZone.setAttribute('aria-label', 'Drop files here or click to select');
+        dropZone.tabIndex = 0;
         const dropzoneContent = dropZone.createDiv({ cls: 'dropzone-content' });
         dropzoneContent.createSpan({ cls: 'dropzone-icon', text: '📂' });
         dropzoneContent.createEl('p', { cls: 'dropzone-text', text: 'drag files here or' });
@@ -108,6 +111,14 @@ export class UploadModal extends Modal {
 
         // Click to select
         selectBtn.addEventListener('click', () => this.fileInputEl?.click());
+
+        // Keyboard support for dropzone
+        dropZone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.fileInputEl?.click();
+            }
+        });
 
         // Drag and drop handlers
         dropZone.addEventListener('dragover', (e) => {
@@ -201,6 +212,9 @@ export class UploadModal extends Modal {
             const option = optionsGrid.createDiv({
                 cls: `size-option ${preset.id === recommended?.id ? 'recommended' : ''}`
             });
+            option.tabIndex = 0;
+            option.setAttribute('role', 'option');
+            option.setAttribute('aria-selected', String(preset.id === recommended?.id));
 
             option.createSpan({ cls: 'size-icon', text: preset.icon });
             option.createSpan({ cls: 'size-label', text: preset.label });
@@ -215,14 +229,25 @@ export class UploadModal extends Modal {
                 this.selectedSize = preset;
             }
 
-            option.addEventListener('click', () => {
+            const selectOption = () => {
                 // Remove selection from all
-                optionsGrid.querySelectorAll('.size-option').forEach(el =>
-                    el.removeClass('selected')
-                );
+                optionsGrid.querySelectorAll('.size-option').forEach(el => {
+                    el.removeClass('selected');
+                    el.setAttribute('aria-selected', 'false');
+                });
                 // Select this one
                 option.addClass('selected');
+                option.setAttribute('aria-selected', 'true');
                 this.selectedSize = preset;
+            };
+
+            option.addEventListener('click', selectOption);
+
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectOption();
+                }
             });
         });
     }
@@ -386,6 +411,19 @@ export class UploadModal extends Modal {
     }
 
     onClose() {
+        // Null out refs to help GC
+        this.selectedFile = null;
+        this.selectedSize = null;
+        this.fileCategory = null;
+        this.fileInputEl = null;
+        this.fileInfoEl = null;
+        this.sizeOptionsEl = null;
+        this.progressEl = null;
+        this.uploadBtn = null;
+        this.progressFillEl = null;
+        this.progressStatusEl = null;
+        this.progressPercentEl = null;
+
         const { contentEl } = this;
         contentEl.empty();
     }

@@ -12,6 +12,9 @@ export const DEFAULT_SETTINGS: DriveEmbedderSettings = {
     googleRefreshToken: '',
     tokenExpiresAt: 0,
 
+    // OAuth redirect port
+    oauthRedirectPort: 8586,
+
     // Drive settings
     driveFolder: 'Obsidian/DriveEmbedder',
 

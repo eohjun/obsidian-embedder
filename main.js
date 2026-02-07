@@ -47,6 +47,8 @@ var DEFAULT_SETTINGS = {
   googleAccessToken: "",
   googleRefreshToken: "",
   tokenExpiresAt: 0,
+  // OAuth redirect port
+  oauthRedirectPort: 8586,
   // Drive settings
   driveFolder: "Obsidian/DriveEmbedder",
   // Embed settings
@@ -73,6 +75,7 @@ var GoogleOAuthFlow = class {
       "https://www.googleapis.com/auth/userinfo.email"
     ];
     this.server = null;
+    this.timeoutId = null;
     this.config = config;
   }
   /**
@@ -130,7 +133,7 @@ var GoogleOAuthFlow = class {
         const authUrl = this.buildAuthUrl(redirectUri, codeChallenge);
         new import_obsidian.Notice("please log in with Google in your browser...", 3e3);
         void import_electron.shell.openExternal(authUrl);
-        setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
           if (this.server) {
             this.cleanup();
             reject(new Error("OAuth flow timed out. Please try again."));
@@ -263,6 +266,10 @@ var GoogleOAuthFlow = class {
    * Cleanup server
    */
   cleanup() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
     if (this.server) {
       this.server.close();
       this.server = null;
@@ -394,12 +401,30 @@ var GoogleDriveUploader = class {
     this.API_URL = "https://www.googleapis.com/drive/v3";
     this.UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3";
     this.REDIRECT_PORT = 8586;
+    this.REQUEST_TIMEOUT_MS = 15e3;
+    this.folderIdCache = /* @__PURE__ */ new Map();
     this.config = config;
     this.oauthFlow = new GoogleOAuthFlow({
       clientId: config.clientId,
       clientSecret: config.clientSecret,
       redirectPort: this.REDIRECT_PORT
     });
+  }
+  /**
+   * Wrap a promise with a timeout
+   */
+  async withTimeout(promise, ms) {
+    const timeout = ms != null ? ms : this.REQUEST_TIMEOUT_MS;
+    let timer;
+    const timeoutPromise = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`Request timed out after ${timeout}ms`)), timeout);
+    });
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } finally {
+      if (timer !== void 0)
+        clearTimeout(timer);
+    }
   }
   /**
    * Start OAuth flow to connect Google Drive
@@ -473,7 +498,7 @@ var GoogleDriveUploader = class {
 Content-Transfer-Encoding: base64\r
 \r
 ` + base64Content + closeDelimiter;
-      const uploadResponse = await (0, import_obsidian2.requestUrl)({
+      const uploadResponse = await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.UPLOAD_URL}/files?uploadType=multipart&fields=id,webViewLink,webContentLink,name,mimeType`,
         method: "POST",
         headers: {
@@ -481,11 +506,14 @@ Content-Transfer-Encoding: base64\r
           "Content-Type": `multipart/related; boundary=${boundary}`
         },
         body: multipartBody
-      });
+      }), 6e4);
       if (uploadResponse.status !== 200) {
         throw new Error(`Upload failed: ${uploadResponse.status}`);
       }
       const fileData = uploadResponse.json;
+      if (!fileData || typeof fileData.id !== "string") {
+        throw new Error("Upload response missing file ID");
+      }
       const fileId = fileData.id;
       onProgress == null ? void 0 : onProgress({
         stage: "setting-permission",
@@ -524,7 +552,7 @@ Content-Transfer-Encoding: base64\r
   async makeFilePublic(fileId) {
     try {
       const accessToken = await this.ensureValidToken();
-      await (0, import_obsidian2.requestUrl)({
+      await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.API_URL}/files/${fileId}/permissions`,
         method: "POST",
         headers: {
@@ -535,7 +563,7 @@ Content-Transfer-Encoding: base64\r
           role: "reader",
           type: "anyone"
         })
-      });
+      }));
     } catch (error) {
       console.error("Failed to make file public:", error);
     }
@@ -546,33 +574,47 @@ Content-Transfer-Encoding: base64\r
   async getFileInfo(fileId) {
     try {
       const accessToken = await this.ensureValidToken();
-      const response = await (0, import_obsidian2.requestUrl)({
+      const response = await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.API_URL}/files/${fileId}?fields=webViewLink,webContentLink`,
         method: "GET",
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }
-      });
+      }));
       return response.json;
     } catch (error) {
       return {};
     }
   }
   /**
-   * Ensure folder exists, creating if necessary
+   * Ensure folder exists, creating if necessary (with in-memory caching)
    */
   async ensureFolder(folderPath) {
     const parts = folderPath.split("/").filter((p) => p.length > 0);
     let parentId = "root";
+    let cumulativePath = "";
     for (const folderName of parts) {
+      cumulativePath += "/" + folderName;
+      const cached = this.folderIdCache.get(cumulativePath);
+      if (cached) {
+        parentId = cached;
+        continue;
+      }
       const existingId = await this.findFolder(folderName, parentId);
       if (existingId) {
         parentId = existingId;
       } else {
         parentId = await this.createFolder(folderName, parentId);
       }
+      this.folderIdCache.set(cumulativePath, parentId);
     }
     return parentId;
+  }
+  /**
+   * Escape single quotes in Google Drive API query strings
+   */
+  escapeQueryValue(value) {
+    return value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   }
   /**
    * Find a folder by name
@@ -580,17 +622,18 @@ Content-Transfer-Encoding: base64\r
   async findFolder(name, parentId) {
     try {
       const accessToken = await this.ensureValidToken();
-      const query = `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-      const response = await (0, import_obsidian2.requestUrl)({
+      const escapedName = this.escapeQueryValue(name);
+      const query = `name='${escapedName}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+      const response = await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.API_URL}/files?q=${encodeURIComponent(query)}&fields=files(id)`,
         method: "GET",
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }
-      });
+      }));
       if (response.status === 200) {
         const data = response.json;
-        if (data.files && data.files.length > 0) {
+        if (data.files && Array.isArray(data.files) && data.files.length > 0 && data.files[0].id) {
           return data.files[0].id;
         }
       }
@@ -609,7 +652,7 @@ Content-Transfer-Encoding: base64\r
       mimeType: "application/vnd.google-apps.folder",
       parents: [parentId]
     };
-    const response = await (0, import_obsidian2.requestUrl)({
+    const response = await this.withTimeout((0, import_obsidian2.requestUrl)({
       url: `${this.API_URL}/files`,
       method: "POST",
       headers: {
@@ -617,7 +660,7 @@ Content-Transfer-Encoding: base64\r
         "Content-Type": "application/json"
       },
       body: JSON.stringify(metadata)
-    });
+    }));
     if (response.status !== 200) {
       throw new Error(`Folder creation failed: ${response.status}`);
     }
@@ -629,13 +672,13 @@ Content-Transfer-Encoding: base64\r
   async testConnection() {
     try {
       const accessToken = await this.ensureValidToken();
-      const response = await (0, import_obsidian2.requestUrl)({
+      const response = await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.API_URL}/about?fields=user`,
         method: "GET",
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }
-      });
+      }));
       return response.status === 200;
     } catch (error) {
       return false;
@@ -647,13 +690,13 @@ Content-Transfer-Encoding: base64\r
   async getUserInfo() {
     try {
       const accessToken = await this.ensureValidToken();
-      const response = await (0, import_obsidian2.requestUrl)({
+      const response = await this.withTimeout((0, import_obsidian2.requestUrl)({
         url: `${this.API_URL}/about?fields=user`,
         method: "GET",
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }
-      });
+      }));
       if (response.status === 200) {
         const data = response.json;
         return {
@@ -675,15 +718,17 @@ Content-Transfer-Encoding: base64\r
     this.config.tokenExpiresAt = 0;
   }
   /**
-   * Convert ArrayBuffer to base64
+   * Convert ArrayBuffer to base64 (chunked to avoid O(n²) string concatenation)
    */
   arrayBufferToBase64(buffer) {
     const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i]);
+    const CHUNK_SIZE = 8192;
+    const chunks = [];
+    for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+      const slice = bytes.subarray(i, Math.min(i + CHUNK_SIZE, bytes.length));
+      chunks.push(String.fromCharCode.apply(null, slice));
     }
-    return btoa(binary);
+    return btoa(chunks.join(""));
   }
 };
 
@@ -903,6 +948,9 @@ var UploadModal = class extends import_obsidian3.Modal {
     this.fileInputEl.accept = SUPPORTED_EXTENSIONS.join(",");
     this.fileInputEl.addEventListener("change", (e) => this.handleFileSelect(e));
     const dropZone = section.createDiv({ cls: "drive-embedder-dropzone" });
+    dropZone.setAttribute("role", "button");
+    dropZone.setAttribute("aria-label", "Drop files here or click to select");
+    dropZone.tabIndex = 0;
     const dropzoneContent = dropZone.createDiv({ cls: "dropzone-content" });
     dropzoneContent.createSpan({ cls: "dropzone-icon", text: "\u{1F4C2}" });
     dropzoneContent.createEl("p", { cls: "dropzone-text", text: "drag files here or" });
@@ -910,6 +958,13 @@ var UploadModal = class extends import_obsidian3.Modal {
     selectBtn.addEventListener("click", () => {
       var _a;
       return (_a = this.fileInputEl) == null ? void 0 : _a.click();
+    });
+    dropZone.addEventListener("keydown", (e) => {
+      var _a;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (_a = this.fileInputEl) == null ? void 0 : _a.click();
+      }
     });
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -979,6 +1034,9 @@ var UploadModal = class extends import_obsidian3.Modal {
       const option = optionsGrid.createDiv({
         cls: `size-option ${preset.id === (recommended == null ? void 0 : recommended.id) ? "recommended" : ""}`
       });
+      option.tabIndex = 0;
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", String(preset.id === (recommended == null ? void 0 : recommended.id)));
       option.createSpan({ cls: "size-icon", text: preset.icon });
       option.createSpan({ cls: "size-label", text: preset.label });
       option.createSpan({ cls: "size-desc", text: preset.description });
@@ -989,12 +1047,21 @@ var UploadModal = class extends import_obsidian3.Modal {
         option.addClass("selected");
         this.selectedSize = preset;
       }
-      option.addEventListener("click", () => {
-        optionsGrid.querySelectorAll(".size-option").forEach(
-          (el) => el.removeClass("selected")
-        );
+      const selectOption = () => {
+        optionsGrid.querySelectorAll(".size-option").forEach((el) => {
+          el.removeClass("selected");
+          el.setAttribute("aria-selected", "false");
+        });
         option.addClass("selected");
+        option.setAttribute("aria-selected", "true");
         this.selectedSize = preset;
+      };
+      option.addEventListener("click", selectOption);
+      option.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectOption();
+        }
       });
     });
   }
@@ -1122,6 +1189,17 @@ var UploadModal = class extends import_obsidian3.Modal {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
   onClose() {
+    this.selectedFile = null;
+    this.selectedSize = null;
+    this.fileCategory = null;
+    this.fileInputEl = null;
+    this.fileInfoEl = null;
+    this.sizeOptionsEl = null;
+    this.progressEl = null;
+    this.uploadBtn = null;
+    this.progressFillEl = null;
+    this.progressStatusEl = null;
+    this.progressPercentEl = null;
     const { contentEl } = this;
     contentEl.empty();
   }
@@ -1289,11 +1367,12 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
     this.initializeServices();
   }
   initializeServices() {
+    const redirectPort = this.settings.oauthRedirectPort || 8586;
     if (this.settings.googleClientId && this.settings.googleClientSecret) {
       this.oauthFlow = new GoogleOAuthFlow({
         clientId: this.settings.googleClientId,
         clientSecret: this.settings.googleClientSecret,
-        redirectPort: 8586
+        redirectPort
       });
       if (this.settings.googleAccessToken) {
         this.uploader = new GoogleDriveUploader({
@@ -1370,7 +1449,10 @@ var DriveEmbedderPlugin = class extends import_obsidian4.Plugin {
             await navigator.clipboard.writeText(embedCode);
             new import_obsidian4.Notice("\u{1F4CB} embed code copied to clipboard!");
           }
-        })();
+        })().catch((error) => {
+          console.error("Drive Embedder: embed generation failed:", error);
+          new import_obsidian4.Notice(`Failed to generate embed: ${error instanceof Error ? error.message : String(error)}`);
+        });
       }
     ).open();
   }
@@ -1431,6 +1513,15 @@ var DriveEmbedderSettingTab = class extends import_obsidian4.PluginSettingTab {
       (text) => text.setPlaceholder("GOCSPX-...").setValue(this.plugin.settings.googleClientSecret).onChange((value) => {
         this.plugin.settings.googleClientSecret = value;
         void this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian4.Setting(containerEl).setName("OAuth redirect port").setDesc("Local port for OAuth callback (change if 8586 is in use)").addText(
+      (text) => text.setPlaceholder("8586").setValue(String(this.plugin.settings.oauthRedirectPort || 8586)).onChange((value) => {
+        const port = parseInt(value, 10);
+        if (!isNaN(port) && port > 0 && port < 65536) {
+          this.plugin.settings.oauthRedirectPort = port;
+          void this.plugin.saveSettings();
+        }
       })
     );
   }

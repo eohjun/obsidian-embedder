@@ -24,6 +24,7 @@ export class GoogleOAuthFlow {
 
     private config: OAuthConfig;
     private server: http.Server | null = null;
+    private timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     constructor(config: OAuthConfig) {
         this.config = config;
@@ -103,7 +104,7 @@ export class GoogleOAuthFlow {
                 void shell.openExternal(authUrl);
 
                 // Set timeout (2 minutes)
-                setTimeout(() => {
+                this.timeoutId = setTimeout(() => {
                     if (this.server) {
                         this.cleanup();
                         reject(new Error('OAuth flow timed out. Please try again.'));
@@ -258,6 +259,10 @@ export class GoogleOAuthFlow {
      * Cleanup server
      */
     private cleanup(): void {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
+        }
         if (this.server) {
             this.server.close();
             this.server = null;
