@@ -422,8 +422,7 @@ var GoogleDriveUploader = class {
     try {
       return await Promise.race([promise, timeoutPromise]);
     } finally {
-      if (timer !== void 0)
-        clearTimeout(timer);
+      if (timer !== void 0) clearTimeout(timer);
     }
   }
   /**
@@ -1006,8 +1005,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     }
   }
   updateFileInfo(file, fileInfo) {
-    if (!this.fileInfoEl)
-      return;
+    if (!this.fileInfoEl) return;
     this.fileInfoEl.empty();
     this.fileInfoEl.removeClass("hidden");
     const infoCard = this.fileInfoEl.createDiv({ cls: "file-info-card" });
@@ -1019,8 +1017,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     fileDetails.createSpan({ text: `Size: ${this.formatFileSize(file.size)}`, cls: "file-size" });
   }
   updateSizeOptions(category) {
-    if (!this.sizeOptionsEl)
-      return;
+    if (!this.sizeOptionsEl) return;
     this.sizeOptionsEl.empty();
     this.sizeOptionsEl.removeClass("hidden");
     const presets = getSizePresets(category);
@@ -1150,8 +1147,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     }
   }
   showProgress() {
-    if (!this.progressEl)
-      return;
+    if (!this.progressEl) return;
     this.progressEl.empty();
     this.progressEl.removeClass("hidden");
     const container = this.progressEl.createDiv({ cls: "progress-container" });
@@ -1163,8 +1159,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     this.progressPercentEl = progressText.createSpan({ cls: "progress-percent", text: "0%" });
   }
   updateProgress(progress) {
-    if (!this.progressEl)
-      return;
+    if (!this.progressEl) return;
     if (this.progressFillEl) {
       this.progressFillEl.setCssStyles({ width: `${progress.progress}%` });
     }
@@ -1181,8 +1176,7 @@ var UploadModal = class extends import_obsidian3.Modal {
     }
   }
   formatFileSize(bytes) {
-    if (bytes === 0)
-      return "0 Bytes";
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
